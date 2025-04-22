@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
             MicrosoftCalendarReadTool,
             MicrosoftCalendarCreateTool,
             MicrosoftFilesTool,
+            MicrosoftFilesReadTool,
             MicrosoftMailTool,
         ]
 

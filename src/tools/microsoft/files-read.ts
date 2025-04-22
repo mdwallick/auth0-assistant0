@@ -1,42 +1,40 @@
+
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { getMicrosoftAccessToken } from '@/lib/auth0';
 
-type FileItem = {
-    name: string;
-    folder: string;
-    lastModifiedDateTime: string;
-    size: number;
-};
-
 const toolSchema = z.object({
-    path: z.string().optional().nullable().describe('Path to the folder (e.g. /Documents). Leave blank for root.'),
+    path: z.string().describe('Full path to the file in OneDrive (e.g. /Documents/example.txt)'),
 });
 
-export const MicrosoftFilesListTool = tool(
-    async ({ path = '' }) => {
-        const token = await getMicrosoftAccessToken();
-        const client = Client.init({
-            authProvider: (done) => done(null, token),
-        });
+export const MicrosoftFilesReadTool = tool(
+    async ({ path }) => {
+        try {
+            const token = await getMicrosoftAccessToken();
+            const client = Client.init({
+                authProvider: (done) => done(null, token),
+            });
 
-        const drivePath = path ? `/me/drive/root:/${path}:/children` : `/me/drive/root/children`;
+            // Get the file content
+            const response = await client.api(`/me/drive/root:${path}:/content`)
+                .get();
 
-        const res = await client.api(drivePath).get();
-
-        return JSON.stringify(
-            res.value.map((item: FileItem) => ({
-                name: item.name,
-                itemType: item.folder ? 'folder' : 'file',
-                lastModified: item.lastModifiedDateTime,
-                size: item.size,
-            })),
-        );
+            return JSON.stringify({
+                status: 'success',
+                content: response,
+            });
+        } catch (e: any) {
+            console.error('Microsoft Files Read tool error:', e);
+            return JSON.stringify({
+                status: 'error',
+                message: e.message,
+            });
+        }
     },
     {
-        name: 'MicrosoftFilesTool',
-        description: "List files from the user's OneDrive folder",
+        name: 'MicrosoftFilesReadTool',
+        description: "Read the contents of a file from the user's OneDrive",
         schema: toolSchema,
     },
 );
