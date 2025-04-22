@@ -20,6 +20,18 @@ type Email = {
             address: string
         }
     }
+    toRecipients?: Array<{
+        emailAddress: {
+            name: string
+            address: string
+        }
+    }>
+    ccRecipients?: Array<{
+        emailAddress: {
+            name: string
+            address: string
+        }
+    }>
 }
 
 const toolSchema = z.object({
@@ -50,13 +62,29 @@ export const MicrosoftMailReadTool = tool(
 
             const res = await req.get()
 
-            return JSON.stringify(res.value.map((email: Email) => ({
-                subject: email.subject,
-                from: email.from?.emailAddress?.address,
-                sender: email.sender?.emailAddress?.address,
-                receivedDateTime: email.receivedDateTime,
-                snippet: email.bodyPreview,
-                type: folder === 'sentItems' ? 'sent' : 'received'
+            return JSON.stringify(res.value.map((email: Email) => {
+                const emailData = {
+                    subject: email.subject,
+                    receivedDateTime: email.receivedDateTime,
+                    snippet: email.bodyPreview,
+                    type: folder === 'sentItems' ? 'sent' : 'received'
+                };
+
+                if (folder === 'sentItems') {
+                    // For sent items, show recipient(s)
+                    return {
+                        ...emailData,
+                        to: email.toRecipients?.map(r => r.emailAddress.address),
+                        cc: email.ccRecipients?.map(r => r.emailAddress.address)
+                    };
+                } else {
+                    // For inbox items, show sender
+                    return {
+                        ...emailData,
+                        from: email.from?.emailAddress?.address,
+                        sender: email.sender?.emailAddress?.address
+                    };
+                }
             })))
         } catch (e: any) {
             console.error('Mail read tool error:', e)
