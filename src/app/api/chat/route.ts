@@ -5,7 +5,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
-import { Client } from 'langsmith';
+import { LangSmithTracer } from "@langchain/core/tracers/langsmith";
 
 // import { GmailSearch } from '@langchain/community/tools/gmail';
 // import { GmailCreateDraft } from '@langchain/community/tools/gmail';
@@ -64,10 +64,8 @@ export async function POST(req: NextRequest) {
             .filter((message: Message) => message.role === 'user' || message.role === 'assistant')
             .map(convertVercelMessageToLangChainMessage);
 
-        const client = new Client();
-        const traceGroup = await client.createTraceGroup({ 
-          name: "Chat Session",
-          metadata: { userId: "anonymous" }
+        const tracer = new LangSmithTracer({
+            projectName: process.env.LANGSMITH_PROJECT
         });
 
         const llm = new ChatOpenAI({
@@ -75,7 +73,7 @@ export async function POST(req: NextRequest) {
             temperature: 0,
         }).withConfig({
             tags: ["chat-api"],
-            traceId: traceGroup.id
+            callbacks: [tracer]
         });
 
         // Get the access token via Auth0
