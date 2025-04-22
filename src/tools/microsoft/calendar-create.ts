@@ -1,3 +1,4 @@
+
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
@@ -10,10 +11,11 @@ const toolSchema = z.object({
     timeZone: z.string().optional().nullable().default('US/Central').describe("Time zone for the event"),
     location: z.string().optional().nullable().describe("Location of the event"),
     attendees: z.array(z.string()).optional().nullable().describe("Email addresses of attendees"),
+    eventId: z.string().optional().nullable().describe("Event ID for updating existing events"),
 })
 
 export const MicrosoftCalendarCreateTool = tool(
-    async ({ subject, startDateTime, endDateTime, timeZone = 'UTC', location, attendees = [] }) => {
+    async ({ subject, startDateTime, endDateTime, timeZone = 'UTC', location, attendees = [], eventId }) => {
         const token = await getMicrosoftAccessToken()
 
         const client = Client.init({
@@ -37,18 +39,25 @@ export const MicrosoftCalendarCreateTool = tool(
             })),
         }
 
-        console.log('Creating event:', event)
+        console.log(eventId ? 'Updating event:' : 'Creating event:', event)
         
-        await client.api('/me/events').post(event)
-
-        return JSON.stringify({
-            status: 'success',
-            message: `Event "${subject}" created successfully from ${startDateTime} to ${endDateTime}`,
-        })
+        if (eventId) {
+            await client.api(`/me/events/${eventId}`).patch(event)
+            return JSON.stringify({
+                status: 'success',
+                message: `Event "${subject}" updated successfully`,
+            })
+        } else {
+            await client.api('/me/events').post(event)
+            return JSON.stringify({
+                status: 'success',
+                message: `Event "${subject}" created successfully from ${startDateTime} to ${endDateTime}`,
+            })
+        }
     },
     {
         name: 'MicrosoftCalendarCreateTool',
-        description: "Create a new event in the user's Microsoft calendar",
+        description: "Create or update an event in the user's Microsoft calendar. Provide eventId to update an existing event.",
         schema: toolSchema,
     }
 )
