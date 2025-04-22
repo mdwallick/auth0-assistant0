@@ -37,6 +37,8 @@ export const MicrosoftCalendarCreateTool = tool(
             })),
         }
 
+        console.log('Creating event:', event)
+        
         await client.api('/me/events').post(event)
 
         return JSON.stringify({

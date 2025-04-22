@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
             MicrosoftMailTool,
         ];
 
-        console.log('Final messages:', JSON.stringify(messages, null, 2));
+        //console.log('Final messages:', JSON.stringify(messages, null, 2));
 
         /**
          * Use a prebuilt LangGraph agent.

@@ -17,7 +17,7 @@ type Email = {
 
 const toolSchema = z.object({
     query: z.string().optional().nullable().describe('Search query for the email subject or body'),
-    top: z.number().default(5).describe('Number of emails to return (default is 5)'),
+    top: z.number().optional().nullable().default(5).describe('Number of emails to return (default is 5)'),
 })
 
 export const MicrosoftMailTool = tool(
