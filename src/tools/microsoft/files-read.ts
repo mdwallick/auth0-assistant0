@@ -19,13 +19,27 @@ export const MicrosoftFilesReadTool = tool(
             // First get the file metadata to determine the type
             const metadata = await client.api(`/me/drive/root:${path}`).get();
             
-            if (metadata.file.mimeType.includes('officedocument') || 
-                metadata.file.mimeType.includes('msword') ||
-                metadata.file.mimeType.includes('pdf')) {
-                // For Office documents, we need to get the text content using the /content endpoint
+            if (metadata.file.mimeType.includes('officedocument.wordprocessingml') || 
+                metadata.file.mimeType.includes('msword')) {
+                // For Word documents, use the /content endpoint with text format
                 const response = await client.api(`/me/drive/items/${metadata.id}/content`)
                     .header('accept', 'text/plain')
                     .get();
+                
+                if (!response) {
+                    // Try alternative method for Word docs
+                    const textContent = await client.api(`/me/drive/items/${metadata.id}/microsoft.graph.workbook/worksheets/Item/range(address='A1:Z1000')/text`)
+                        .get();
+                    return JSON.stringify({
+                        status: 'success',
+                        content: textContent,
+                        metadata: {
+                            name: metadata.name,
+                            type: metadata.file.mimeType,
+                            size: metadata.size
+                        }
+                    });
+                }
                 
                 return JSON.stringify({
                     status: 'success',
