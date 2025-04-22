@@ -5,6 +5,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
+import { Client } from '@langsmith/client';
 
 // import { GmailSearch } from '@langchain/community/tools/gmail';
 // import { GmailCreateDraft } from '@langchain/community/tools/gmail';
@@ -63,9 +64,18 @@ export async function POST(req: NextRequest) {
             .filter((message: Message) => message.role === 'user' || message.role === 'assistant')
             .map(convertVercelMessageToLangChainMessage);
 
+        const client = new Client();
+        const traceGroup = await client.createTraceGroup({ 
+          name: "Chat Session",
+          metadata: { userId: "anonymous" }
+        });
+
         const llm = new ChatOpenAI({
             model: process.env.OPENAI_MODEL,
             temperature: 0,
+        }).withConfig({
+            tags: ["chat-api"],
+            traceId: traceGroup.id
         });
 
         // Get the access token via Auth0
