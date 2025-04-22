@@ -13,6 +13,10 @@ type Email = {
     }
     receivedDateTime: string
     bodyPreview: string
+    body: {
+        contentType: string
+        content: string
+    }
     sender: {
         emailAddress: {
             name: string
@@ -67,6 +71,7 @@ export const MicrosoftMailReadTool = tool(
                         subject: email.subject,
                         receivedDateTime: email.receivedDateTime,
                         snippet: email.bodyPreview,
+                        body: email.body.content,
                         type: 'sent',
                         recipients: email.toRecipients?.map(r => r.emailAddress.address) || [],
                         ccRecipients: email.ccRecipients?.map(r => r.emailAddress.address) || []
@@ -76,6 +81,7 @@ export const MicrosoftMailReadTool = tool(
                         subject: email.subject,
                         receivedDateTime: email.receivedDateTime,
                         snippet: email.bodyPreview,
+                        body: email.body.content,
                         type: 'received',
                         from: email.from?.emailAddress?.address,
                         sender: email.sender?.emailAddress?.address
