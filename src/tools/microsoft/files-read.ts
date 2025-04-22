@@ -1,6 +1,6 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { Client } from '@microsoft/microsoft-graph-client';
+import { Client, ResponseType } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 import { getMicrosoftAccessToken } from '@/lib/auth0';
 //import pdf from 'pdf-parse'
@@ -29,7 +29,7 @@ export const MicrosoftFilesReadTool = tool(
             const fileMime = metadata.file?.mimeType || '';
             const fileBuffer = await client
                 .api(`/me/drive/items/${metadata.id}/content`)
-                .responseType('arraybuffer')
+                .responseType(ResponseType.ARRAYBUFFER)
                 .get();
 
             const buffer = Buffer.from(fileBuffer);
