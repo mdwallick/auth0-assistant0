@@ -15,7 +15,7 @@ import { SerpAPI } from '@langchain/community/tools/serpapi';
 import {
     MicrosoftMailTool,
     MicrosoftCalendarReadTool,
-    MicrosoftCalendarCreateTool,
+    MicrosoftCalendarWriteTool,
     MicrosoftFilesReadTool,
     MicrosoftFilesListTool,
     MicrosoftFilesWriteTool,
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
             // new GoogleCalendarCreateTool(googleCalendarParams),
             // new GoogleCalendarViewTool(googleCalendarParams),
             MicrosoftCalendarReadTool,
-            MicrosoftCalendarCreateTool,
+            MicrosoftCalendarWriteTool,
             MicrosoftFilesListTool,
             MicrosoftFilesReadTool,
             MicrosoftFilesWriteTool,
