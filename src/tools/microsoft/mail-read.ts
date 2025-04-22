@@ -40,7 +40,7 @@ export const MicrosoftMailReadTool = tool(
             // Use different endpoint based on folder
             const endpoint = folder === 'sentItems' 
                 ? '/me/mailFolders/SentItems/messages'
-                : '/me/messages'
+                : '/me/mailFolders/Inbox/messages'
 
             const req = client.api(endpoint).top(top).orderby('receivedDateTime DESC')
 
