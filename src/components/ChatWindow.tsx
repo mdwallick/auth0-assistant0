@@ -132,7 +132,7 @@ export function ChatWindow(props: {
   });
 
   function isChatLoading(): boolean {
-    return chat.status === 'streaming';
+    return chat.isLoading;
   }
 
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
