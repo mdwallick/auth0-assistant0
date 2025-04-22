@@ -62,10 +62,12 @@ export async function POST(req: NextRequest) {
         let tracer;
         if (process.env.LANGSMITH_TRACING === 'true') {
             tracer = new LangChainTracer({
-                projectName: process.env.LANGSMITH_PROJECT,
-                // Add unique identifiers as tags
-                tags: [`request-${crypto.randomUUID()}`, `timestamp-${Date.now()}`],
-                ensureRunId: true
+                projectName: process.env.LANGSMITH_PROJECT || "default",
+                // Add unique identifiers through metadata
+                extra: {
+                    requestId: crypto.randomUUID(),
+                    timestamp: Date.now()
+                }
             });
         }
 
