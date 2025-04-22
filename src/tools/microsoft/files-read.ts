@@ -16,8 +16,10 @@ export const MicrosoftFilesReadTool = tool(
                 authProvider: (done) => done(null, token),
             });
 
+            // Handle path with or without leading slash
+            const normalizedPath = path.startsWith('/') ? path : `/${path}`;
             // First get the file metadata to determine the type
-            const metadata = await client.api(`/me/drive/root:${path}`).get();
+            const metadata = await client.api(`/me/drive/root:${normalizedPath}`).get();
             
             if (metadata.file.mimeType.includes('officedocument.wordprocessingml') || 
                 metadata.file.mimeType.includes('msword')) {
