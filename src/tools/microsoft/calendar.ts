@@ -1,2 +1,2 @@
-export { MicrosoftCalendarReadTool } from './calendar-read';
-export { MicrosoftCalendarCreateTool } from './calendar-create';
+export { MicrosoftCalendarReadTool } from './calendar-read'
+export { MicrosoftCalendarWriteTool } from './calendar-write'

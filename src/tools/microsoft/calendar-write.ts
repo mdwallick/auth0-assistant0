@@ -14,7 +14,7 @@ const toolSchema = z.object({
     eventId: z.string().optional().nullable().describe("Event ID for updating existing events"),
 })
 
-export const MicrosoftCalendarCreateTool = tool(
+export const MicrosoftCalendarWriteTool = tool(
     async ({ subject, startDateTime, endDateTime, timeZone = 'UTC', location, attendees = [], eventId }) => {
         const token = await getMicrosoftAccessToken()
 
@@ -56,7 +56,7 @@ export const MicrosoftCalendarCreateTool = tool(
         }
     },
     {
-        name: 'MicrosoftCalendarCreateTool',
+        name: 'MicrosoftCalendarWriteTool',
         description: "Create or update an event in the user's Microsoft calendar. Provide eventId to update an existing event.",
         schema: toolSchema,
     }
