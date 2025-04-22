@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
             .filter((message: Message) => message.role === 'user' || message.role === 'assistant')
             .map(convertVercelMessageToLangChainMessage);
 
-        const tracer = new LangSmithTracer({
+        const tracer = new LangChainTracer({
             projectName: process.env.LANGSMITH_PROJECT
         });
 
