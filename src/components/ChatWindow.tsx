@@ -17,11 +17,17 @@ function ChatMessages(props: {
   emptyStateComponent: ReactNode;
   aiEmoji?: string;
   className?: string;
+  isStreaming?: boolean;
 }) {
   return (
     <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
       {props.messages.map((m, i) => {
-        return <ChatMessageBubble key={m.id} message={m} aiEmoji={props.aiEmoji} />;
+        return <ChatMessageBubble 
+            key={m.id} 
+            message={m} 
+            aiEmoji={props.aiEmoji}
+            isLoading={m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming} 
+          />;
       })}
     </div>
   );
@@ -148,6 +154,7 @@ export function ChatWindow(props: {
               aiEmoji={props.emoji}
               messages={chat.messages}
               emptyStateComponent={props.emptyStateComponent}
+              isStreaming={isChatLoading()}
             />
           )
         }

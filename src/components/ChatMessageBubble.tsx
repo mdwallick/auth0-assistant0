@@ -1,8 +1,9 @@
 import type { Message } from 'ai/react';
 import { MemoizedMarkdown } from './MemoizedMarkdown';
 import { cn } from '@/utils/cn';
+import { LoaderCircle } from 'lucide-react';
 
-export function ChatMessageBubble(props: { message: Message; aiEmoji?: string }) {
+export function ChatMessageBubble(props: { message: Message; aiEmoji?: string; isLoading?: boolean }) {
   return (
     <div
       className={cn(
@@ -18,7 +19,14 @@ export function ChatMessageBubble(props: { message: Message; aiEmoji?: string })
       )}
 
       <div className="chat-message-bubble whitespace-pre-wrap flex flex-col prose dark:prose-invert max-w-none">
-        <MemoizedMarkdown content={props.message.content} id={props.message.id} />
+        {props.isLoading ? (
+          <div className="flex items-center gap-2">
+            <LoaderCircle className="animate-spin" />
+            <span>Thinking...</span>
+          </div>
+        ) : (
+          <MemoizedMarkdown content={props.message.content} id={props.message.id} />
+        )}
       </div>
     </div>
   );
