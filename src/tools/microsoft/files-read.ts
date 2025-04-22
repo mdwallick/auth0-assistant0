@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
 import 'isomorphic-fetch'
 import { getMicrosoftAccessToken } from '@/lib/auth0'
-import PDFNet from '@pdftron/pdfnet-node'
+import pdf from 'pdf-parse'
 import mammoth from 'mammoth'
 import * as XLSX from 'xlsx'
 
@@ -34,11 +34,8 @@ export const MicrosoftFilesReadTool = tool(
 
             // PDF
             if (fileMime.includes('pdf')) {
-                await PDFNet.initialize()
-                const doc = await PDFNet.PDFDoc.createFromBuffer(buffer)
-                const textExtractor = await PDFNet.TextExtractor.create()
-                const text = await textExtractor.extractText(doc)
-                return success(text, metadata, fileMime)
+                const pdfData = await pdf(buffer)
+                return success(pdfData.text, metadata, fileMime)
             }
 
             // Plain text
