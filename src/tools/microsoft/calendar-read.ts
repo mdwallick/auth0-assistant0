@@ -6,11 +6,11 @@ import { getMicrosoftAccessToken } from '@/lib/auth0'
 const toolSchema = z.object({
     timeMin: z.string().datetime().describe('Start time in ISO 8601 format'),
     timeMax: z.string().datetime().describe('End time in ISO 8601 format'),
-    timeZone: z.string().optional().nullable().describe('Time zone to use for the calendar'),
+    timeZone: z.string().optional().nullable().default('US/Central').describe('Time zone to use for the calendar'),
 })
 
 export const MicrosoftCalendarReadTool = tool(
-    async ({ timeMin, timeMax, timeZone }) => {
+    async ({ timeMin, timeMax, timeZone = 'US/Central' }) => {
         // Get Microsoft OAuth token via Auth0
         const accessToken = await getMicrosoftAccessToken()
 

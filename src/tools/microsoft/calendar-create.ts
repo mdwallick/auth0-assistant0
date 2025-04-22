@@ -7,7 +7,7 @@ const toolSchema = z.object({
     subject: z.string().describe("The title of the event"),
     startDateTime: z.string().datetime().describe("Start time in ISO 8601 format"),
     endDateTime: z.string().datetime().describe("End time in ISO 8601 format"),
-    timeZone: z.string().optional().nullable().describe("Time zone for the event"),
+    timeZone: z.string().optional().nullable().default('US/Central').describe("Time zone for the event"),
     location: z.string().optional().nullable().describe("Location of the event"),
     attendees: z.array(z.string()).optional().nullable().describe("Email addresses of attendees"),
 })
