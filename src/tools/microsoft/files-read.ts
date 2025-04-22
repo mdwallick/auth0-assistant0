@@ -16,14 +16,27 @@ export const MicrosoftFilesReadTool = tool(
                 authProvider: (done) => done(null, token),
             });
 
-            // Get the file content
-            const response = await client.api(`/me/drive/root:${path}:/content`)
-                .get();
-
-            return JSON.stringify({
-                status: 'success',
-                content: response,
-            });
+            // First get the file metadata to determine the type
+            const metadata = await client.api(`/me/drive/root:${path}`).get();
+            
+            if (metadata.file.mimeType.includes('officedocument')) {
+                // For Office documents, we need to get the text content
+                const response = await client.api(`/me/drive/root:${path}:/content`)
+                    .header('accept', 'text/plain')
+                    .get();
+                return JSON.stringify({
+                    status: 'success',
+                    content: response,
+                });
+            } else {
+                // For other files, get raw content
+                const response = await client.api(`/me/drive/root:${path}:/content`)
+                    .get();
+                return JSON.stringify({
+                    status: 'success',
+                    content: response,
+                });
+            }
         } catch (e: any) {
             console.error('Microsoft Files Read tool error:', e);
             return JSON.stringify({
