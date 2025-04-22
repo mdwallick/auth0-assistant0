@@ -13,7 +13,8 @@ import { SerpAPI } from '@langchain/community/tools/serpapi';
 
 // import microsoft tools
 import {
-    MicrosoftMailTool,
+    MicrosoftMailReadTool,
+    MicrosoftMailWriteTool,
     MicrosoftCalendarReadTool,
     MicrosoftCalendarWriteTool,
     MicrosoftFilesReadTool,
@@ -93,7 +94,8 @@ export async function POST(req: NextRequest) {
             MicrosoftFilesListTool,
             MicrosoftFilesReadTool,
             MicrosoftFilesWriteTool,
-            MicrosoftMailTool,
+            MicrosoftMailReadTool,
+            MicrosoftMailWriteTool,
         ];
 
         //console.log('Final messages:', JSON.stringify(messages, null, 2));

@@ -56,3 +56,6 @@ export const MicrosoftMailTool = tool(
         schema: toolSchema,
     },
 )
+
+export { MicrosoftMailReadTool } from './mail-read'
+export { MicrosoftMailWriteTool } from './mail-write'
