@@ -19,14 +19,22 @@ export const MicrosoftFilesReadTool = tool(
             // First get the file metadata to determine the type
             const metadata = await client.api(`/me/drive/root:${path}`).get();
             
-            if (metadata.file.mimeType.includes('officedocument')) {
-                // For Office documents, we need to get the text content
-                const response = await client.api(`/me/drive/root:${path}:/content`)
+            if (metadata.file.mimeType.includes('officedocument') || 
+                metadata.file.mimeType.includes('msword') ||
+                metadata.file.mimeType.includes('pdf')) {
+                // For Office documents, we need to get the text content using the /content endpoint
+                const response = await client.api(`/me/drive/items/${metadata.id}/content`)
                     .header('accept', 'text/plain')
                     .get();
+                
                 return JSON.stringify({
                     status: 'success',
                     content: response,
+                    metadata: {
+                        name: metadata.name,
+                        type: metadata.file.mimeType,
+                        size: metadata.size
+                    }
                 });
             } else {
                 // For other files, get raw content
@@ -35,6 +43,11 @@ export const MicrosoftFilesReadTool = tool(
                 return JSON.stringify({
                     status: 'success',
                     content: response,
+                    metadata: {
+                        name: metadata.name,
+                        type: metadata.file.mimeType,
+                        size: metadata.size
+                    }
                 });
             }
         } catch (e: any) {
