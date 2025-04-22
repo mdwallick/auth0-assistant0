@@ -85,7 +85,7 @@ export const MicrosoftMailReadTool = tool(
                         sender: email.sender?.emailAddress?.address
                     };
                 }
-            })))
+            }
         } catch (e: any) {
             console.error('Mail read tool error:', e)
             return { status: 'error', message: e.message }
