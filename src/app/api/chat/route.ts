@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
             modelName: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
             temperature: 0,
         }).bind({
-            functions: tools.map(tool => tool.schema),
+            tools: tools,
         }).withConfig({
             tags: ["chat-api"],
             callbacks: [tracer]
