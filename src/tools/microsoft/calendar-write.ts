@@ -33,10 +33,10 @@ export const MicrosoftCalendarWriteTool = tool(
                 timeZone,
             },
             location: location ? { displayName: location } : undefined,
-            attendees: attendees.map((email) => ({
+            attendees: attendees?.map((email) => ({
                 emailAddress: { address: email },
                 type: 'required',
-            })),
+            })) || [],
         }
 
         console.log(eventId ? 'Updating event:' : 'Creating event:', event)
