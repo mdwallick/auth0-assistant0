@@ -5,7 +5,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
-import { Client } from '@langsmith/client';
+import { Client } from 'langsmith';
 
 // import { GmailSearch } from '@langchain/community/tools/gmail';
 // import { GmailCreateDraft } from '@langchain/community/tools/gmail';
