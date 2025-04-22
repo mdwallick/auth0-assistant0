@@ -3,6 +3,7 @@ import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { LangChainTracer } from "langchain/callbacks";
@@ -69,8 +70,10 @@ export async function POST(req: NextRequest) {
         });
 
         const llm = new ChatOpenAI({
-            model: process.env.OPENAI_MODEL,
+            modelName: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
             temperature: 0,
+        }).bind({
+            functions: tools.map(tool => tool.schema),
         }).withConfig({
             tags: ["chat-api"],
             callbacks: [tracer]
