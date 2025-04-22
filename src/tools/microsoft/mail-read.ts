@@ -1,4 +1,3 @@
-
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
@@ -85,7 +84,7 @@ export const MicrosoftMailReadTool = tool(
                         sender: email.sender?.emailAddress?.address
                     };
                 }
-            }
+            }))
         } catch (e: any) {
             console.error('Mail read tool error:', e)
             return { status: 'error', message: e.message }
