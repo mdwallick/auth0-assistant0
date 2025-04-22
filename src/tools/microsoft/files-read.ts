@@ -1,4 +1,3 @@
-
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -20,38 +19,52 @@ export const MicrosoftFilesReadTool = tool(
             const normalizedPath = path.startsWith('/') ? path : `/${path}`;
             // First get the file metadata to determine the type
             const metadata = await client.api(`/me/drive/root:${normalizedPath}`).get();
-            
-            if (metadata.file.mimeType.includes('officedocument.wordprocessingml') || 
-                metadata.file.mimeType.includes('msword')) {
-                // For Word documents, use the /content endpoint with text format
-                const response = await client.api(`/me/drive/items/${metadata.id}/content`)
-                    .header('accept', 'text/plain')
-                    .get();
-                
-                if (!response) {
-                    // Try alternative method for Word docs
-                    const textContent = await client.api(`/me/drive/items/${metadata.id}/microsoft.graph.workbook/worksheets/Item/range(address='A1:Z1000')/text`)
+
+            if (metadata.file.mimeType.includes('officedocument') || 
+                metadata.file.mimeType.includes('msword') ||
+                metadata.file.mimeType.includes('pdf')) {
+                // For Office documents, try to get text content
+                try {
+                    const response = await client.api(`/me/drive/items/${metadata.id}/content`)
                         .get();
-                    return JSON.stringify({
-                        status: 'success',
-                        content: textContent,
-                        metadata: {
-                            name: metadata.name,
-                            type: metadata.file.mimeType,
-                            size: metadata.size
-                        }
-                    });
-                }
-                
-                return JSON.stringify({
-                    status: 'success',
-                    content: response,
-                    metadata: {
-                        name: metadata.name,
-                        type: metadata.file.mimeType,
-                        size: metadata.size
+
+                    if (response) {
+                        // If we got text content, return it
+                        return JSON.stringify({
+                            status: 'success',
+                            content: response.toString(),
+                            metadata: {
+                                name: metadata.name,
+                                type: metadata.file.mimeType,
+                                size: metadata.size
+                            }
+                        });
                     }
-                });
+                } catch (error) {
+                    console.error('Error reading file content:', error);
+                    // Try getting file content through the /preview endpoint
+                    try {
+                        const preview = await client.api(`/me/drive/items/${metadata.id}/preview`)
+                            .post({});
+
+                        if (preview && preview.getUrl) {
+                            const previewContent = await fetch(preview.getUrl)
+                                .then(res => res.text());
+
+                            return JSON.stringify({
+                                status: 'success',
+                                content: previewContent,
+                                metadata: {
+                                    name: metadata.name,
+                                    type: metadata.file.mimeType,
+                                    size: metadata.size
+                                }
+                            });
+                        }
+                    } catch (previewError) {
+                        console.error('Error getting preview:', previewError);
+                    }
+                }
             } else {
                 // For other files, get raw content
                 const response = await client.api(`/me/drive/root:${path}:/content`)
