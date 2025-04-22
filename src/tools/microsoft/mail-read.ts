@@ -61,30 +61,28 @@ export const MicrosoftMailReadTool = tool(
 
             const res = await req.get()
 
-            return JSON.stringify(res.value.map((email: Email) => {
-                const emailData = {
-                    subject: email.subject,
-                    receivedDateTime: email.receivedDateTime,
-                    snippet: email.bodyPreview,
-                    type: folder === 'sentItems' ? 'sent' : 'received'
-                };
-
+            const emails = res.value.map((email: Email) => {
                 if (folder === 'sentItems') {
-                    // For sent items, show recipient(s)
                     return {
-                        ...emailData,
-                        to: email.toRecipients?.map(r => r.emailAddress.address),
-                        cc: email.ccRecipients?.map(r => r.emailAddress.address)
+                        subject: email.subject,
+                        receivedDateTime: email.receivedDateTime,
+                        snippet: email.bodyPreview,
+                        type: 'sent',
+                        recipients: email.toRecipients?.map(r => r.emailAddress.address) || [],
+                        ccRecipients: email.ccRecipients?.map(r => r.emailAddress.address) || []
                     };
                 } else {
-                    // For inbox items, show sender
                     return {
-                        ...emailData,
+                        subject: email.subject,
+                        receivedDateTime: email.receivedDateTime,
+                        snippet: email.bodyPreview,
+                        type: 'received',
                         from: email.from?.emailAddress?.address,
                         sender: email.sender?.emailAddress?.address
                     };
                 }
-            }))
+            });
+            return JSON.stringify(emails)
         } catch (e: any) {
             console.error('Mail read tool error:', e)
             return { status: 'error', message: e.message }
