@@ -9,7 +9,7 @@ const toolSchema = z.object({
     endDateTime: z.string().datetime().describe("End time in ISO 8601 format"),
     timeZone: z.string().optional().nullable().describe("Time zone for the event"),
     location: z.string().optional().nullable().describe("Location of the event"),
-    attendees: z.array(z.string()).optional().describe("Email addresses of attendees"),
+    attendees: z.array(z.string()).optional().nullable().describe("Email addresses of attendees"),
 })
 
 export const MicrosoftCalendarCreateTool = tool(
