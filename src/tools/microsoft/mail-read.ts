@@ -29,7 +29,8 @@ const toolSchema = z.object({
 })
 
 export const MicrosoftMailReadTool = tool(
-    async ({ query, top = 5, folder = 'inbox' }) => {
+    async ({ query, top: rawTop = 5, folder = 'inbox' }) => {
+        const top = typeof rawTop === 'number' ? rawTop : 5;
         try {
             const token = await getMicrosoftAccessToken()
             const client = Client.init({
