@@ -16,8 +16,9 @@ import {
     MicrosoftMailTool,
     MicrosoftCalendarReadTool,
     MicrosoftCalendarCreateTool,
-    MicrosoftFilesTool
-} from "@/tools/microsoft";
+    MicrosoftFilesReadTool,
+    MicrosoftFilesListTool,
+} from '@/tools/microsoft';
 
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
 import { logToolCallsInDevelopment } from '@/utils/stream-logging';
@@ -80,12 +81,12 @@ export async function POST(req: NextRequest) {
             // new GoogleCalendarViewTool(googleCalendarParams),
             MicrosoftCalendarReadTool,
             MicrosoftCalendarCreateTool,
-            MicrosoftFilesTool,
+            MicrosoftFilesListTool,
             MicrosoftFilesReadTool,
             MicrosoftMailTool,
-        ]
+        ];
 
-        console.log("Final messages:", JSON.stringify(messages, null, 2))
+        console.log('Final messages:', JSON.stringify(messages, null, 2));
 
         /**
          * Use a prebuilt LangGraph agent.
