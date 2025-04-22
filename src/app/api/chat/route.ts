@@ -18,6 +18,7 @@ import {
     MicrosoftCalendarCreateTool,
     MicrosoftFilesReadTool,
     MicrosoftFilesListTool,
+    MicrosoftFilesWriteTool,
 } from '@/tools/microsoft';
 
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
