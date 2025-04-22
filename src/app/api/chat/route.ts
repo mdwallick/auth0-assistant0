@@ -59,9 +59,14 @@ export async function POST(req: NextRequest) {
             .filter((message: Message) => message.role === 'user' || message.role === 'assistant')
             .map(convertVercelMessageToLangChainMessage);
 
-        const tracer = new LangChainTracer({
-            projectName: process.env.LANGSMITH_PROJECT
-        });
+        let tracer;
+        if (process.env.LANGSMITH_TRACING === 'true') {
+            tracer = new LangChainTracer({
+                projectName: process.env.LANGSMITH_PROJECT,
+                // Add a unique identifier to prevent conflicts
+                metadata: { requestId: crypto.randomUUID() }
+            });
+        }
 
         const llm = new ChatOpenAI({
             modelName: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
@@ -70,7 +75,7 @@ export async function POST(req: NextRequest) {
             tools: tools,
         }).withConfig({
             tags: ["chat-api"],
-            callbacks: [tracer]
+            callbacks: tracer ? [tracer] : undefined
         });
 
         const agent = createReactAgent({
