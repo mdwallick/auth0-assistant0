@@ -29,6 +29,10 @@ const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
 
+Current time information:
+- Current date and time: ${new Date().toLocaleString('en-US', { timeZone: 'US/Central' })} US/Central
+- Current ISO timestamp: ${new Date().toISOString()}
+
 IMPORTANT: When using tools that create or modify data (like calendar events, files, or emails):
 1. Call the tool exactly once
 2. Wait for the response
