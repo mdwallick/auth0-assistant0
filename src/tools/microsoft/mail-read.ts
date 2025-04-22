@@ -24,7 +24,7 @@ type Email = {
 
 const toolSchema = z.object({
     query: z.string().optional().nullable().describe('Search query for the email subject or body'),
-    top: z.number().optional().default(5).describe('Number of emails to return (default is 5)'),
+    top: z.number().optional().nullable().default(5).describe('Number of emails to return (default is 5)'),
     folder: z.enum(['inbox', 'sentItems']).optional().nullable().default('inbox').describe('Folder to search in: inbox for received emails, sentItems for sent emails'),
 })
 
