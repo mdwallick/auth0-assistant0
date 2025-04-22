@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch'; // required by Microsoft Graph Client
 import { getMicrosoftAccessToken } from '@/lib/auth0';
-import pdf from 'pdf-parse';
+import pdf from 'pdf-parse'
 
 const toolSchema = z.object({
     path: z.string().describe('Full path to the file in OneDrive (e.g. /example.pdf or /notes.txt)'),
