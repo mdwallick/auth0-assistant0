@@ -1,4 +1,3 @@
-
 import './globals.css';
 import { Roboto_Mono, Inter } from 'next/font/google';
 import Image from 'next/image';
@@ -8,7 +7,6 @@ import { ActiveLink } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { auth0 } from '@/lib/auth0';
-import { ServiceAuthPanel } from '@/components/ServiceAuthPanel';
 
 const robotoMono = Roboto_Mono({ weight: '400', subsets: ['latin'] });
 const publicSans = Inter({ weight: '400', subsets: ['latin'] });
@@ -37,14 +35,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="bg-secondary grid grid-rows-[auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
-              <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
+              <a
+                href="https://a0.to/ai-event"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="flex items-center gap-2 px-4"
+              >
+                <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
+              </a>
               <span className={`${robotoMono.className} text-white text-2xl`}>Assistant0</span>
               <nav className="flex gap-1 flex-col md:flex-row">
                 <ActiveLink href="/">Chat</ActiveLink>
+                {/* <ActiveLink href="/act">Interact //TODO</ActiveLink> */}
               </nav>
             </div>
-            <div className="flex items-center gap-2">
-              <ServiceAuthPanel />
+            <div className="flex justify-center">
               {session && (
                 <>
                   <div className="flex items-center gap-2 px-4 text-white">Welcome, {session?.user?.name}!</div>
