@@ -12,12 +12,15 @@ export default function ProfilePage() {
   const [editedUser, setEditedUser] = useState<any>(null);
 
   useEffect(() => {
+    // User data is already available through Auth0 session in layout.tsx
     const fetchUser = async () => {
-      const response = await fetch('/api/services/status');
-      const data = await response.json();
-      if (data.user) {
-        setUser(data.user);
-        setEditedUser(data.user);
+      try {
+        const response = await fetch('/api/auth/me');
+        const sessionData = await response.json();
+        setUser(sessionData);
+        setEditedUser(sessionData);
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
       }
     };
     fetchUser();
