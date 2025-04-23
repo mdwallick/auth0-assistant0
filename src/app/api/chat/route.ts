@@ -1,5 +1,7 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { type Message, LangChainAdapter } from 'ai';
+import { type Message } from 'ai';
+import { LangChainAdapter } from '@langchain/core/adapters/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
@@ -8,8 +10,8 @@ import { LangChainTracer } from "langchain/callbacks";
 // import general tools
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
-import { serviceRegistry } from '@/lib/service-registry'
-import { ServiceStatusTool } from '@/tools/system/service-status'
+import { serviceRegistry } from '@/lib/service-registry';
+import { ServiceStatusTool } from '@/tools/system/service-status';
 
 // import Google tools
 import { GmailSearch } from '@langchain/community/tools/gmail';
@@ -32,7 +34,7 @@ import {
     SalesforceQueryTool, 
     SalesforceCreateTool, 
     SalesforceSearchTool 
-} from '@/tools/salesforce'
+} from '@/tools/salesforce';
 
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
 import { logToolCallsInDevelopment } from '@/utils/stream-logging';
@@ -61,41 +63,39 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
 const getAvailableTools = () => {
-    const tools = [Calculator, SerpAPI, ServiceStatusTool]
+    const tools = [new Calculator(), new SerpAPI(), new ServiceStatusTool()];
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
-            MicrosoftCalendarReadTool,
-            MicrosoftCalendarWriteTool,
-            MicrosoftFilesListTool,
-            MicrosoftFilesReadTool,
-            MicrosoftFilesWriteTool,
-            MicrosoftMailReadTool,
-            MicrosoftMailWriteTool
-        )
+            new MicrosoftCalendarReadTool(),
+            new MicrosoftCalendarWriteTool(),
+            new MicrosoftFilesListTool(),
+            new MicrosoftFilesReadTool(),
+            new MicrosoftFilesWriteTool(),
+            new MicrosoftMailReadTool(),
+            new MicrosoftMailWriteTool()
+        );
     }
 
     if (serviceRegistry.isServiceActive('salesforce')) {
         tools.push(
-            SalesforceQueryTool,
-            SalesforceCreateTool,
-            SalesforceSearchTool
-        )
+            new SalesforceQueryTool(),
+            new SalesforceCreateTool(),
+            new SalesforceSearchTool()
+        );
     }
 
     if (serviceRegistry.isServiceActive('google')) {
         tools.push(
-            GmailSearch,
-            GmailCreateDraft,
-            GoogleCalendarCreateTool,
-            GoogleCalendarViewTool,
-        )
+            new GmailSearch(),
+            new GmailCreateDraft(),
+            new GoogleCalendarCreateTool(),
+            new GoogleCalendarViewTool()
+        );
     }
     
-    return tools
-}
-
-const tools = getAvailableTools()
+    return tools;
+};
 
 export async function POST(req: NextRequest) {
     try {
@@ -111,6 +111,8 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        const tools = getAvailableTools();
+
         const llm = new ChatOpenAI({
             modelName: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
             temperature: 0,
@@ -124,10 +126,10 @@ export async function POST(req: NextRequest) {
         const agent = createReactAgent({
             llm,
             tools,
-            messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
+            systemMessage: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
         });
 
-        const eventStream = agent.streamEvents({ messages }, { version: 'v2' });
+        const eventStream = await agent.streamEvents({ messages }, { version: 'v2' });
         const transformedStream = logToolCallsInDevelopment(eventStream);
         return LangChainAdapter.toDataStreamResponse(transformedStream);
     } catch (e: any) {
