@@ -11,20 +11,21 @@ interface ServiceAuthProps {
 
 export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
   const handleAuth = async () => {
-    try {
-      const response = await fetch(`/api/auth/${service}`, {
-        method: 'POST'
-      })
+    
+    // try {
+    //   const response = await fetch(`/api/auth/${service}`, {
+    //     method: 'POST'
+    //   })
       
-      if (!response.ok) {
-        throw new Error(`Failed to authenticate with ${service}`)
-      }
+    //   if (!response.ok) {
+    //     throw new Error(`Failed to authenticate with ${service}`)
+    //   }
       
-      const data = await response.json()
-      window.location.href = data.authUrl
-    } catch (error: any) {
-      toast.error(`Authentication failed: ${error.message}`)
-    }
+    //   const data = await response.json()
+    //   window.location.href = data.authUrl
+    // } catch (error: any) {
+    //   toast.error(`Authentication failed: ${error.message}`)
+    // }
   }
 
   return (
