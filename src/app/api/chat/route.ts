@@ -12,8 +12,8 @@ import { convertVercelMessageToLangChainMessage } from '@/utils/message-converte
 import { logToolCallsInDevelopment } from '@/utils/stream-logging';
 
 // import general tools
-// import { Calculator } from '@langchain/community/tools/calculator';
-// import { SerpAPI } from '@langchain/community/tools/serpapi';
+import { Calculator } from '@langchain/community/tools/calculator';
+import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { serviceRegistry } from '@/lib/service-registry';
 import { ServiceStatusTool } from '@/tools/system/service-status';
 
@@ -66,17 +66,17 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
 const getAvailableTools = () => {
-    const tools: ToolInterface[] = [ServiceStatusTool];
+    const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool];
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
-            MicrosoftCalendarReadTool as unknown as ToolInterface,
-            MicrosoftCalendarWriteTool as unknown as ToolInterface,
-            MicrosoftFilesListTool as unknown as ToolInterface,
-            MicrosoftFilesReadTool as unknown as ToolInterface,
-            MicrosoftFilesWriteTool as unknown as ToolInterface,
-            MicrosoftMailReadTool as unknown as ToolInterface,
-            MicrosoftMailWriteTool as unknown as ToolInterface
+            MicrosoftCalendarReadTool,
+            MicrosoftCalendarWriteTool,
+            MicrosoftFilesListTool,
+            MicrosoftFilesReadTool,
+            MicrosoftFilesWriteTool,
+            MicrosoftMailReadTool,
+            MicrosoftMailWriteTool,
         );
     }
 
