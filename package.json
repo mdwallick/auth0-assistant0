@@ -29,6 +29,7 @@
     "clsx": "^2.1.1",
     "googleapis": "^148.0.0",
     "isomorphic-fetch": "^3.0.0",
+    "jsforce": "^3.8.0",
     "jwt-decode": "^4.0.0",
     "langchain": "^0.3.23",
     "langsmith": "^0.3.20",
