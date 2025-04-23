@@ -3,8 +3,8 @@ import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
-import { Calculator } from '@langchain/community/tools/calculator';
-import { SerpAPI } from '@langchain/community/tools/serpapi';
+// import { Calculator } from '@langchain/community/tools/calculator';
+// import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { LangChainTracer } from "langchain/callbacks";
 import { serviceRegistry } from '@/lib/service-registry'
 
@@ -84,9 +84,10 @@ const getAvailableTools = () => {
 
     if (serviceRegistry.isServiceActive('google')) {
         tools.push(
-            SalesforceQueryTool,
-            SalesforceCreateTool,
-            SalesforceSearchTool
+            GmailSearch,
+            GmailCreateDraft,
+            GoogleCalendarCreateTool,
+            GoogleCalendarViewTool,
         )
     }
     
