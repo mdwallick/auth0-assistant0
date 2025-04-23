@@ -1,13 +1,14 @@
-import jsforce from 'jsforce'
-import { getSalesforceAccessToken } from '@/lib/auth0'
+
+import jsforce from 'jsforce';
+import { serviceManager } from '@/lib/auth0';
 
 export async function getSalesforceClient() {
-    const token = await getSalesforceAccessToken()
+    const token = await serviceManager.getAccessToken('salesforce');
 
     const conn = new jsforce.Connection({
         instanceUrl: process.env.SALESFORCE_LOGIN_URL || 'https://login.salesforce.com',
         accessToken: token,
-    })
+    });
 
-    return conn
+    return conn;
 }
