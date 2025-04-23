@@ -7,8 +7,9 @@ export async function POST(
   { params }: { params: { service: string } }
 ) {
   try {
+    const service = await Promise.resolve(params.service)
     let connection: string
-    switch (params.service) {
+    switch (service) {
       case 'microsoft':
         connection = 'windowslive'
         break
