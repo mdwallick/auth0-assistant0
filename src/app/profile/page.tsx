@@ -1,7 +1,7 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import { auth0 } from '@/lib/auth0';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ServiceAuthPanel } from '@/components/ServiceAuthPanel';
@@ -13,9 +13,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const session = await auth0.getSession();
-      setUser(session?.user);
-      setEditedUser(session?.user);
+      const response = await fetch('/api/services/status');
+      const data = await response.json();
+      if (data.user) {
+        setUser(data.user);
+        setEditedUser(data.user);
+      }
     };
     fetchUser();
   }, []);
