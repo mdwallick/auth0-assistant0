@@ -35,14 +35,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="bg-secondary grid grid-rows-[auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
-              <a
+              {/* <a
                 href="https://a0.to/ai-event"
                 rel="noopener noreferrer"
                 target="_blank"
                 className="flex items-center gap-2 px-4"
-              >
+              > */}
                 <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
-              </a>
+              {/* </a> */}
               <span className={`${robotoMono.className} text-white text-2xl`}>Assistant0</span>
               <nav className="flex gap-1 flex-col md:flex-row">
                 <ActiveLink href="/">Chat</ActiveLink>
