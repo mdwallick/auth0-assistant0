@@ -22,7 +22,7 @@ export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
       
       const data = await response.json()
       window.location.href = data.authUrl
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Authentication failed: ${error.message}`)
     }
   }
