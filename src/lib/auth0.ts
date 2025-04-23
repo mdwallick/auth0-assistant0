@@ -13,7 +13,7 @@ export const getGoogleAccessToken = async () => {
     const { token } = await auth0.getAccessTokenForConnection({
         connection: 'google-oauth2',
     })
-    serviceRegistry.register('google', token); // Register Google service
+    serviceRegistry.registerService('google'); // Register Google service
     return token
 }
 
@@ -22,7 +22,7 @@ export const getMicrosoftAccessToken = async () => {
     const { token } = await auth0.getAccessTokenForConnection({
         connection: "windowslive",
     })
-    serviceRegistry.register('microsoft', token); // Register Microsoft service
+    serviceRegistry.registerService('microsoft'); // Register Microsoft service
     return token
 }
 
@@ -31,26 +31,6 @@ export const getSalesforceAccessToken = async () => {
     const { token } = await auth0.getAccessTokenForConnection({
         connection: "salesforce-dev",
     })
-    serviceRegistry.register('salesforce', token); // Register Salesforce service
+    serviceRegistry.registerService('salesforce'); // Register Salesforce service
     return token
 }
-
-
-// Placeholder for service-registry.js -  This needs to be implemented separately.
-// This is a basic example and error handling would need to be added in a real application
-// This file should be created in the same directory.
-//  './service-registry.js'
-/*
-export const serviceRegistry = {
-  services: {},
-  register: function(serviceName, token) {
-    this.services[serviceName] = token;
-  },
-  isAvailable: function(serviceName) {
-    return this.services.hasOwnProperty(serviceName);
-  },
-  getToken: function(serviceName) {
-    return this.services[serviceName];
-  }
-};
-*/

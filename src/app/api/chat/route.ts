@@ -6,7 +6,14 @@ import { SystemMessage } from '@langchain/core/messages';
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { LangChainTracer } from "langchain/callbacks";
+import { serviceRegistry } from '@/lib/service-registry'
 
+// import Google tools
+import { GmailSearch } from '@langchain/community/tools/gmail';
+import { GmailCreateDraft } from '@langchain/community/tools/gmail';
+import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
+
+// import Microsoft tools
 import {
     MicrosoftMailReadTool,
     MicrosoftMailWriteTool,
@@ -16,6 +23,13 @@ import {
     MicrosoftFilesWriteTool,
     MicrosoftFilesListTool,
 } from '@/tools/microsoft';
+
+// import Salesforce tools
+import { 
+    SalesforceQueryTool, 
+    SalesforceCreateTool, 
+    SalesforceSearchTool 
+} from '@/tools/salesforce'
 
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
 import { logToolCallsInDevelopment } from '@/utils/stream-logging';
@@ -40,15 +54,9 @@ Use Microsoft file tools to examine files in the user's OneDrive.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
-import { serviceRegistry } from '@/lib/service-registry'
-import { 
-    SalesforceQueryTool, 
-    SalesforceCreateTool, 
-    SalesforceSearchTool 
-} from '@/tools/salesforce'
-
 const getAvailableTools = () => {
-    const tools = [new Calculator(), new SerpAPI()]
+    //const tools = [new Calculator(), new SerpAPI()]
+    const tools = []
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
@@ -70,6 +78,14 @@ const getAvailableTools = () => {
         )
     }
 
+    if (serviceRegistry.isServiceActive('google')) {
+        tools.push(
+            SalesforceQueryTool,
+            SalesforceCreateTool,
+            SalesforceSearchTool
+        )
+    }
+    
     return tools
 }
 
