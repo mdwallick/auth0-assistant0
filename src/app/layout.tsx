@@ -1,9 +1,14 @@
+
 import './globals.css';
 import { Roboto_Mono, Inter } from 'next/font/google';
 import Image from 'next/image';
-import { Navbar } from '@/components/Navbar';
+import { Github, LogOut } from 'lucide-react';
+
+import { ActiveLink } from '@/components/Navbar';
+import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { auth0 } from '@/lib/auth0';
+import { ServiceAuthPanel } from '@/components/ServiceAuthPanel';
 
 const robotoMono = Roboto_Mono({ weight: '400', subsets: ['latin'] });
 const publicSans = Inter({ weight: '400', subsets: ['latin'] });
@@ -30,7 +35,35 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={publicSans.className}>
         <div className="bg-secondary grid grid-rows-[auto,1fr] h-[100dvh]">
-          <Navbar />
+          <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
+            <div className="flex gap-4 flex-col md:flex-row md:items-center">
+              <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
+              <span className={`${robotoMono.className} text-white text-2xl`}>Assistant0</span>
+              <nav className="flex gap-1 flex-col md:flex-row">
+                <ActiveLink href="/">Chat</ActiveLink>
+              </nav>
+            </div>
+            <div className="flex items-center gap-2">
+              <ServiceAuthPanel />
+              {session && (
+                <>
+                  <div className="flex items-center gap-2 px-4 text-white">Welcome, {session?.user?.name}!</div>
+                  <Button asChild variant="destructive" size="default" className="mx-2">
+                    <a href="/auth/logout" className="flex items-center gap-2">
+                      <LogOut />
+                      <span>Logout</span>
+                    </a>
+                  </Button>
+                </>
+              )}
+              <Button asChild variant="header" size="default">
+                <a href="https://github.com/oktadev/auth0-assistant0" target="_blank">
+                  <Github className="size-3" />
+                  <span>Open in GitHub</span>
+                </a>
+              </Button>
+            </div>
+          </div>
           <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
             <div className="absolute inset-0">{children}</div>
           </div>
