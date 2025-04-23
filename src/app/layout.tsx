@@ -36,9 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
               <a
-                href="https://a0.to/ai-event"
-                rel="noopener noreferrer"
-                target="_blank"
+                href="/"
                 className="flex items-center gap-2 px-4"
               >
                 <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
