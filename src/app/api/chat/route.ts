@@ -38,6 +38,9 @@ const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
 
+Before using any service-specific tools (Microsoft, Salesforce, Google), check if the service is active using the ServiceStatusTool.
+If a requested service is not active, inform the user they need to authenticate with that service first.
+
 Current time information:
 - Current date and time: ${new Date().toLocaleString('en-US', { timeZone: 'US/Central' })} US/Central
 - Current ISO timestamp: ${new Date().toISOString()}
@@ -54,9 +57,10 @@ Use Microsoft file tools to examine files in the user's OneDrive.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
+import { ServiceStatusTool } from '@/tools/system/service-status'
+
 const getAvailableTools = () => {
-    //const tools = [new Calculator(), new SerpAPI()]
-    const tools = []
+    const tools = [ServiceStatusTool]
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
