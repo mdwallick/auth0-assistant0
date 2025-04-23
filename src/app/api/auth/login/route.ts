@@ -25,18 +25,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid connection' }, { status: 400 })
     }
 
-    const { url } = await auth0.startInteractiveLogin({
+    await auth0.startInteractiveLogin({
       authorizationParameters: {
         connection,
         redirectUri: `${process.env.APP_BASE_URL}/auth/callback`,
-        scope: 'openid profile email offline_access',
+        // scope: 'openid profile email offline_access',
       }
     })
 
     // Register the service
     serviceRegistry.registerService(service)
 
-    return NextResponse.redirect(url)
+    //return NextResponse.redirect(url)
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'Login failed' }, { status: 500 })
