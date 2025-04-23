@@ -11,7 +11,22 @@ interface ServiceAuthProps {
 
 export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
   const handleAuth = async () => {
-    
+    let connection: string
+    switch (service) {
+      case 'microsoft':
+        connection = 'windowslive'
+        break
+      case 'salesforce':
+        connection = 'salesforce-dev'
+        break
+      case 'google':
+        connection = 'google-oauth2'
+        break
+      default:
+        throw new Error(`Invalid service ${service}`)
+    }
+
+    window.location.href = `/auth/login?connection=${connection}`
     // try {
     //   const response = await fetch(`/api/auth/${service}`, {
     //     method: 'POST'
