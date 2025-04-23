@@ -4,4 +4,10 @@
 
 // // You can add more tools here as you develop additional features (e.g., tasks, contacts, etc.)
 
-// export const tools = [MicrosoftCalendarTool, MicrosoftMailTool, MicrosoftFilesTool]
+import { SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool } from './salesforce'
+
+export const tools = [
+    SalesforceQueryTool,
+    SalesforceCreateTool,
+    SalesforceSearchTool
+]
