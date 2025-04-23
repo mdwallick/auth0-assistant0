@@ -26,21 +26,11 @@ export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
         throw new Error(`Invalid service ${service}`)
     }
 
-    window.location.href = `/auth/login?connection=${connection}`
-    // try {
-    //   const response = await fetch(`/api/auth/${service}`, {
-    //     method: 'POST'
-    //   })
-      
-    //   if (!response.ok) {
-    //     throw new Error(`Failed to authenticate with ${service}`)
-    //   }
-      
-    //   const data = await response.json()
-    //   window.location.href = data.authUrl
-    // } catch (error: any) {
-    //   toast.error(`Authentication failed: ${error.message}`)
-    // }
+    try {
+      window.location.href = `/api/auth/login?connection=${connection}`
+    } catch (error: any) {
+      toast.error(`Authentication failed: ${error.message}`)
+    }
   }
 
   return (
