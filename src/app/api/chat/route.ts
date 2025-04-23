@@ -40,17 +40,40 @@ Use Microsoft file tools to examine files in the user's OneDrive.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
-const tools = [
-    new Calculator(),
-    new SerpAPI(),
-    MicrosoftCalendarReadTool,
-    MicrosoftCalendarWriteTool,
-    MicrosoftFilesListTool,
-    MicrosoftFilesReadTool,
-    MicrosoftFilesWriteTool,
-    MicrosoftMailReadTool,
-    MicrosoftMailWriteTool,
-];
+import { serviceRegistry } from '@/lib/service-registry'
+import { 
+    SalesforceQueryTool, 
+    SalesforceCreateTool, 
+    SalesforceSearchTool 
+} from '@/tools/salesforce'
+
+const getAvailableTools = () => {
+    const tools = [new Calculator(), new SerpAPI()]
+    
+    if (serviceRegistry.isServiceActive('microsoft')) {
+        tools.push(
+            MicrosoftCalendarReadTool,
+            MicrosoftCalendarWriteTool,
+            MicrosoftFilesListTool,
+            MicrosoftFilesReadTool,
+            MicrosoftFilesWriteTool,
+            MicrosoftMailReadTool,
+            MicrosoftMailWriteTool
+        )
+    }
+
+    if (serviceRegistry.isServiceActive('salesforce')) {
+        tools.push(
+            SalesforceQueryTool,
+            SalesforceCreateTool,
+            SalesforceSearchTool
+        )
+    }
+
+    return tools
+}
+
+const tools = getAvailableTools()
 
 export async function POST(req: NextRequest) {
     try {
