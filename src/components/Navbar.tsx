@@ -31,7 +31,9 @@ export function Navbar() {
         <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" width={32} height={32} />
         <span className="text-xl font-semibold">Assistant0</span>
       </div>
-      <ServiceAuthPanel />
+      <div className="flex-shrink-0">
+        <ServiceAuthPanel />
+      </div>
     </nav>
   )
 }
