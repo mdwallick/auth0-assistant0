@@ -1,4 +1,3 @@
-
 import { Auth0Client } from '@auth0/nextjs-auth0/server';
 
 export type SupportedService = 'microsoft' | 'salesforce' | 'google';
@@ -9,9 +8,9 @@ interface ServiceConfig {
 }
 
 const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
-  microsoft: { connection: 'windowslive', scope: 'openid profile email offline_access' },
-  salesforce: { connection: 'salesforce-dev', scope: 'openid profile email offline_access' },
-  google: { connection: 'google-oauth2', scope: 'openid profile email offline_access' }
+  microsoft: { connection: 'windowslive' },
+  salesforce: { connection: 'salesforce-dev' },
+  google: { connection: 'google-oauth2' }
 };
 
 export class ServiceManager {

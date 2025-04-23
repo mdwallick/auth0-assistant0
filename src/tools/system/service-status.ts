@@ -1,11 +1,12 @@
 
 import { tool } from '@langchain/core/tools'
 import { serviceRegistry } from '@/lib/service-registry'
+import type { SupportedService } from '@/lib/service-registry'
 
 export const ServiceStatusTool = tool(
     async () => {
         const activeServices = serviceRegistry.getActiveServices()
-        const allServices = ['microsoft', 'salesforce', 'google']
+        const allServices: SupportedService[] = ['microsoft', 'salesforce', 'google']
         
         const status = allServices.map(service => ({
             service,

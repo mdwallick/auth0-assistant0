@@ -1,22 +1,24 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { type Message } from 'ai';
-import { LangChainAdapter } from '@langchain/core/adapters/openai';
+import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
 import { LangChainTracer } from "langchain/callbacks";
+import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
+import { logToolCallsInDevelopment } from '@/utils/stream-logging';
 
 // import general tools
-import { Calculator } from '@langchain/community/tools/calculator';
-import { SerpAPI } from '@langchain/community/tools/serpapi';
+// import { Calculator } from '@langchain/community/tools/calculator';
+// import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { serviceRegistry } from '@/lib/service-registry';
 import { ServiceStatusTool } from '@/tools/system/service-status';
 
 // import Google tools
-import { GmailSearch } from '@langchain/community/tools/gmail';
-import { GmailCreateDraft } from '@langchain/community/tools/gmail';
-import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
+// import { getGoogleAccessToken } from '@/lib/auth0';
+// import { GmailSearch } from '@langchain/community/tools/gmail';
+// import { GmailCreateDraft } from '@langchain/community/tools/gmail';
+// import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
 
 // import Microsoft tools
 import {
@@ -35,9 +37,6 @@ import {
     SalesforceCreateTool, 
     SalesforceSearchTool 
 } from '@/tools/salesforce';
-
-import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
-import { logToolCallsInDevelopment } from '@/utils/stream-logging';
 
 const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
@@ -58,12 +57,13 @@ IMPORTANT: When using tools that create or modify data (like calendar events, fi
 
 Use Microsoft calendar tools to check or create events in the user's Microsoft calendar.
 Use Microsoft file tools to examine files in the user's OneDrive.
+Use Salesforce tools to query or create records in Salesforce.
 
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
 const getAvailableTools = () => {
-    const tools = [new Calculator(), new SerpAPI(), new ServiceStatusTool()];
+    const tools = [ServiceStatusTool];
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
@@ -85,14 +85,25 @@ const getAvailableTools = () => {
         );
     }
 
-    if (serviceRegistry.isServiceActive('google')) {
-        tools.push(
-            new GmailSearch(),
-            new GmailCreateDraft(),
-            new GoogleCalendarCreateTool(),
-            new GoogleCalendarViewTool()
-        );
-    }
+    // if (serviceRegistry.isServiceActive('google')) {
+    //     const accessToken = await getGoogleAccessToken()
+    //     // Provide the access token to the Gmail tools
+    //     const gmailParams = {
+    //       credentials: { accessToken },
+    //     };
+
+    //     const googleCalendarParams = {
+    //       credentials: { accessToken, calendarId: 'primary' },
+    //       //model: llm,
+    //     };
+        
+    //     tools.push(
+    //         new GmailSearch(gmailParams),
+    //         new GmailCreateDraft(gmailParams),
+    //         new GoogleCalendarCreateTool(googleCalendarParams),
+    //         new GoogleCalendarViewTool(googleCalendarParams)
+    //     );
+    // }
     
     return tools;
 };
@@ -126,7 +137,7 @@ export async function POST(req: NextRequest) {
         const agent = createReactAgent({
             llm,
             tools,
-            systemMessage: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
+            messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
         });
 
         const eventStream = await agent.streamEvents({ messages }, { version: 'v2' });
