@@ -25,10 +25,12 @@ export async function POST(
         )
     }
 
-    const { url } = await auth0.getAuthorizeUrlForConnection({
-      connection,
-      redirectUri: `${process.env.AUTH0_BASE_URL}/api/auth/callback`,
-      scope: 'openid profile email offline_access',
+    const { url } = await auth0.startInteractiveLogin({
+      authorizationParameters: {
+        connection,
+        redirectUri: `${process.env.APP_BASE_URL}/auth/callback`,
+        scope: 'openid profile email offline_access',
+      }
     })
 
     return NextResponse.json({ authUrl: url })

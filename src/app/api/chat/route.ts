@@ -3,10 +3,13 @@ import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
 import { SystemMessage } from '@langchain/core/messages';
-// import { Calculator } from '@langchain/community/tools/calculator';
-// import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { LangChainTracer } from "langchain/callbacks";
+
+// import general tools
+import { Calculator } from '@langchain/community/tools/calculator';
+import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { serviceRegistry } from '@/lib/service-registry'
+import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
 import { GmailSearch } from '@langchain/community/tools/gmail';
@@ -57,10 +60,8 @@ Use Microsoft file tools to examine files in the user's OneDrive.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
-import { ServiceStatusTool } from '@/tools/system/service-status'
-
 const getAvailableTools = () => {
-    const tools = [ServiceStatusTool]
+    const tools = [Calculator, SerpAPI, ServiceStatusTool]
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
