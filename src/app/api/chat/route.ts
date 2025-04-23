@@ -1,5 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
+
+import { ToolInterface } from '@langchain/core/tools';
+
 import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
@@ -63,17 +66,17 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
 const getAvailableTools = () => {
-    const tools = [ServiceStatusTool];
+    const tools: ToolInterface[] = [ServiceStatusTool];
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
-            MicrosoftCalendarReadTool,
-            MicrosoftCalendarWriteTool,
-            MicrosoftFilesListTool,
-            MicrosoftFilesReadTool,
-            MicrosoftFilesWriteTool,
-            MicrosoftMailReadTool,
-            MicrosoftMailWriteTool
+            MicrosoftCalendarReadTool as unknown as ToolInterface,
+            MicrosoftCalendarWriteTool as unknown as ToolInterface,
+            MicrosoftFilesListTool as unknown as ToolInterface,
+            MicrosoftFilesReadTool as unknown as ToolInterface,
+            MicrosoftFilesWriteTool as unknown as ToolInterface,
+            MicrosoftMailReadTool as unknown as ToolInterface,
+            MicrosoftMailWriteTool as unknown as ToolInterface
         );
     }
 
