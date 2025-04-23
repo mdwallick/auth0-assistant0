@@ -67,21 +67,21 @@ const getAvailableTools = () => {
     
     if (serviceRegistry.isServiceActive('microsoft')) {
         tools.push(
-            new MicrosoftCalendarReadTool(),
-            new MicrosoftCalendarWriteTool(),
-            new MicrosoftFilesListTool(),
-            new MicrosoftFilesReadTool(),
-            new MicrosoftFilesWriteTool(),
-            new MicrosoftMailReadTool(),
-            new MicrosoftMailWriteTool()
+            MicrosoftCalendarReadTool,
+            MicrosoftCalendarWriteTool,
+            MicrosoftFilesListTool,
+            MicrosoftFilesReadTool,
+            MicrosoftFilesWriteTool,
+            MicrosoftMailReadTool,
+            MicrosoftMailWriteTool
         );
     }
 
     if (serviceRegistry.isServiceActive('salesforce')) {
         tools.push(
-            new SalesforceQueryTool(),
-            new SalesforceCreateTool(),
-            new SalesforceSearchTool()
+            SalesforceQueryTool,
+            SalesforceCreateTool,
+            SalesforceSearchTool
         );
     }
 
