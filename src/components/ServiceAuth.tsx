@@ -12,7 +12,7 @@ interface ServiceAuthProps {
 export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
   const handleAuth = async () => {
     try {
-      const response = await fetch(`/auth/${service}`, {
+      const response = await fetch(`/api/auth/${service}`, {
         method: 'POST'
       })
       
