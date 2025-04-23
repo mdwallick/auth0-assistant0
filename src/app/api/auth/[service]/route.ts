@@ -1,4 +1,8 @@
 
+import { ServiceManager } from '@/lib/service-manager'
+import type { SupportedService } from '@/lib/service-manager'
+
+
 import { NextRequest, NextResponse } from 'next/server'
 import { auth0 } from '@/lib/auth0'
 
@@ -33,6 +37,10 @@ export async function POST(
         scope: 'openid profile email offline_access',
       }
     })
+
+    // Register the service after successful authentication
+    const serviceManager = ServiceManager.getInstance()
+    serviceManager.registerService(service as SupportedService)
 
     return NextResponse.json({ authUrl: url })
   } catch (error) {
