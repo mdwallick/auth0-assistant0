@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: { service: string } }
 ) {
   try {
-    const service = await Promise.resolve(params.service)
+    const { service } = params;
     let connection: string
     switch (service) {
       case 'microsoft':
