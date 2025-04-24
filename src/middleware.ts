@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   const authRes = await auth0.middleware(request);
 
   // authentication routes — let the middleware handle it
-  if (request.nextUrl.pathname.startsWith('/api/auth')) {
+  if (request.nextUrl.pathname.startsWith('/auth')) {
     return authRes;
   }
 
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
 
   // user does not have a session — redirect to login
   if (!session) {
-    return NextResponse.redirect(`${origin}/api/auth/login`);
+    return NextResponse.redirect(`${origin}/auth/login`);
   }
 
   return authRes;
