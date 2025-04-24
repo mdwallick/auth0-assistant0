@@ -13,12 +13,32 @@ interface ChatMessageBubbleProps {
 }
 
 export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBubbleProps) {
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [selectedService, setSelectedService] = useState<'microsoft' | 'salesforce' | 'google' | null>(null);
+  
 
   const handleAuthClick = (service: 'microsoft' | 'salesforce' | 'google') => {
-    setSelectedService(service);
-    setShowAuthDialog(true);
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      `/api/auth/${service}`,
+      'Auth0 Login',
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+    );
+
+    if (!popup) {
+      toast.error('Please enable popups for this site');
+      return;
+    }
+
+    // Poll for popup closure
+    const pollTimer = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(pollTimer);
+        window.location.reload(); // Refresh to update auth state
+      }
+    }, 200);
   };
 
   // Check if message contains service connection request
@@ -110,13 +130,7 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
           </div>
         )}
       </div>
-      {selectedService && (
-        <ServiceAuthDialog
-          service={selectedService}
-          isOpen={showAuthDialog}
-          onOpenChange={setShowAuthDialog}
-        />
-      )}
+      
     </>
   );
 }
