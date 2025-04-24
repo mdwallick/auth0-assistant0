@@ -24,8 +24,27 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
   // Check if message contains service connection request
   const checkForServiceRequest = (content: string) => {
     const lowerContent = content.toLowerCase();
-    if (lowerContent.includes('connect to microsoft') || lowerContent.includes('authenticate with microsoft')) {
+    if (lowerContent.includes('microsoft') && (
+      lowerContent.includes('connect') || 
+      lowerContent.includes('authenticate') || 
+      lowerContent.includes('login') ||
+      lowerContent.includes('sign in')
+    )) {
       return 'microsoft';
+    } else if (lowerContent.includes('salesforce') && (
+      lowerContent.includes('connect') || 
+      lowerContent.includes('authenticate') ||
+      lowerContent.includes('login') ||
+      lowerContent.includes('sign in')
+    )) {
+      return 'salesforce';
+    } else if (lowerContent.includes('google') && (
+      lowerContent.includes('connect') || 
+      lowerContent.includes('authenticate') ||
+      lowerContent.includes('login') ||
+      lowerContent.includes('sign in')
+    )) {
+      return 'google';
     }
     return null;
   };
