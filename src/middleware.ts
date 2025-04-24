@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   const authRes = await auth0.middleware(request);
 
   // authentication routes — let the middleware handle it
-  if (request.nextUrl.pathname.startsWith('/auth')) {
+  if (request.nextUrl.pathname.startsWith('/api/auth')) {
     return authRes;
   }
 
