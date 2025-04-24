@@ -1,7 +1,7 @@
 import './globals.css';
 import { Roboto_Mono, Inter } from 'next/font/google';
 import Image from 'next/image';
-import { Github, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 import { ActiveLink, Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -35,16 +35,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="bg-secondary grid grid-rows-[auto,auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
-              <a
-                href="/"
-                className="flex items-center gap-2 px-4"
-              >
-                <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
-              </a>
+              <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" className="h-8" width={143} height={32} />
               <span className={`${robotoMono.className} text-white text-2xl`}>Assistant0</span>
               <nav className="flex gap-1 flex-col md:flex-row">
                 <ActiveLink href="/">Chat</ActiveLink>
-                {/* <ActiveLink href="/act">Interact //TODO</ActiveLink> */}
               </nav>
             </div>
             <div className="flex justify-center">
@@ -63,12 +57,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   </Button>
                 </>
               )}
-              <Button asChild variant="header" size="default">
-                <a href="https://github.com/oktadev/auth0-assistant0" target="_blank">
-                  <Github className="size-3" />
-                  <span>Open in GitHub</span>
-                </a>
-              </Button>
             </div>
           </div>
           <Navbar />

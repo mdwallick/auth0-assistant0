@@ -34,14 +34,12 @@ export function Navbar() {
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-4">
-        <Image src="/images/auth0-ai-logo.svg" alt="Auth0 AI Logo" width={32} height={32} />
-        <span className="text-xl font-semibold">Assistant0</span>
+        
       </div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={clearChat}>
           New Chat
         </Button>
-        <ServiceAuthPanel />
       </div>
     </nav>
   )
