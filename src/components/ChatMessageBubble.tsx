@@ -3,6 +3,7 @@ import { MemoizedMarkdown } from './MemoizedMarkdown';
 import { Button } from './ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { ServiceAuthDialog } from './ServiceAuthDialog';
 import { cn } from '@/utils/cn';
 
