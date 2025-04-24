@@ -1,15 +1,15 @@
+
 import { NextRequest, NextResponse } from 'next/server'
 import { auth0 } from '@/lib/auth0'
 
 export async function GET(
   request: NextRequest,
-  context: { params: { service: string } }
+  { params }: { params: { service: string } }
 ) {
   try {
-    const service = context.params.service
     let connection: string
     
-    switch (service) {
+    switch (params.service) {
       case 'microsoft':
         connection = 'windowslive'
         break
