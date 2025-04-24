@@ -1,28 +1,28 @@
-import * as marked from 'marked';
+
 import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
-  const tokens = marked.lexer(markdown);
-  return tokens.map((token: any) => token.raw);
+  if (!markdown) return [];
+  return [markdown];
 }
 
-const MemoizedMarkdownBlock = memo(
-  ({ content }: { content: string }) => {
-    return <ReactMarkdown>{content}</ReactMarkdown>;
-  },
-  (prevProps, nextProps) => {
-    if (prevProps.content !== nextProps.content) return false;
-    return true;
-  },
-);
+export const MemoizedMarkdown = memo(function MemoizedMarkdown({
+  children,
+  components,
+}: {
+  children: string;
+  components?: any;
+}) {
+  const blocks = useMemo(() => parseMarkdownIntoBlocks(children), [children]);
 
-MemoizedMarkdownBlock.displayName = 'MemoizedMarkdownBlock';
-
-export const MemoizedMarkdown = memo(({ content, id }: { content: string; id: string }) => {
-  const blocks = useMemo(() => parseMarkdownIntoBlocks(content), [content]);
-
-  return blocks.map((block, index) => <MemoizedMarkdownBlock content={block} key={`${id}-block_${index}`} />);
+  return (
+    <>
+      {blocks.map((block, i) => (
+        <ReactMarkdown key={i} components={components}>
+          {block}
+        </ReactMarkdown>
+      ))}
+    </>
+  );
 });
-
-MemoizedMarkdown.displayName = 'MemoizedMarkdown';
