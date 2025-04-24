@@ -1,4 +1,4 @@
-import { marked } from 'marked';
+import * as marked from 'marked';
 import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 
