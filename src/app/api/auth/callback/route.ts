@@ -40,19 +40,36 @@ export async function GET(request: NextRequest) {
       <html>
         <head>
           <title>Authentication Complete</title>
-          <script>
-            window.onload = function() {
-              if (window.opener) {
-                window.opener.postMessage({ type: 'AUTH_COMPLETE', service: '${service}' }, '*');
-                setTimeout(() => window.close(), 500);
-              }
+          <style>
+            body { 
+              font-family: system-ui, -apple-system, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              margin: 0;
+              background: #f9fafb;
             }
-          </script>
+            .message {
+              text-align: center;
+              padding: 20px;
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+          </style>
         </head>
         <body>
-          <div style="text-align: center; padding: 20px;">
-            Authentication successful! This window will close automatically.
+          <div class="message">
+            <h3>Authentication Successful!</h3>
+            <p>This window will close automatically...</p>
           </div>
+          <script>
+            if (window.opener) {
+              window.opener.postMessage({ type: 'AUTH_COMPLETE', service: '${service}' }, '*');
+              setTimeout(() => window.close(), 1000);
+            }
+          </script>
         </body>
       </html>
     `;
