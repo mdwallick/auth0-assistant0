@@ -36,17 +36,23 @@ export async function GET(request: NextRequest) {
 
     // Return HTML that closes the popup and sends a message to the parent window
     const successHtml = `
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Authentication Complete</title>
-        </head>
-        <body>
           <script>
-            if (window.opener) {
-              window.opener.postMessage({ type: 'AUTH_COMPLETE', service: '${service}' }, '*');
-              window.close();
+            window.onload = function() {
+              if (window.opener) {
+                window.opener.postMessage({ type: 'AUTH_COMPLETE', service: '${service}' }, '*');
+                setTimeout(() => window.close(), 500);
+              }
             }
           </script>
+        </head>
+        <body>
+          <div style="text-align: center; padding: 20px;">
+            Authentication successful! This window will close automatically.
+          </div>
         </body>
       </html>
     `;
