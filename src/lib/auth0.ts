@@ -5,9 +5,9 @@ import { ServiceManager } from './service-manager';
 export const auth0 = new Auth0Client({
   routes: {
     login: "/api/auth/login",
-    //logout: "/logout",
-    //callback: "/api/auth/callback",
-    //backChannelLogout: "/backchannel-logout",
+    logout: "/api/auth/logout",
+    callback: "/api/auth/callback",
+    backToApp: "/",
   },
   async onCallback(error, context, session) {
     // redirect the user to a custom error page
