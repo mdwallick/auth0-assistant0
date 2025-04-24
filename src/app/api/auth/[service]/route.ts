@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { service: string } }
 ) {
   try {
-    const service = await params.service;
+    const { service } = params;
     let connection: string;
     
     switch (service) {
