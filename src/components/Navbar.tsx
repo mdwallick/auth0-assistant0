@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -7,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { ServiceAuthPanel } from './ServiceAuthPanel';
+import { Button } from '@/components/ui/button'; // Added import
 
 export const ActiveLink = (props: { href: string; children: ReactNode }) => {
   const pathname = usePathname();
