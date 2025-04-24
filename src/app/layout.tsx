@@ -3,7 +3,7 @@ import { Roboto_Mono, Inter } from 'next/font/google';
 import Image from 'next/image';
 import { Github, LogOut } from 'lucide-react';
 
-import { ActiveLink } from '@/components/Navbar';
+import { ActiveLink, Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { auth0 } from '@/lib/auth0';
@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="twitter:image" content="/images/og-image.png" />
       </head>
       <body className={publicSans.className}>
-        <div className="bg-secondary grid grid-rows-[auto,1fr] h-[100dvh]">
+        <div className="bg-secondary grid grid-rows-[auto,auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
               <a
@@ -71,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </Button>
             </div>
           </div>
+          <Navbar />
           <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
             <div className="absolute inset-0">{children}</div>
           </div>
