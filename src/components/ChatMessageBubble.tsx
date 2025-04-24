@@ -32,6 +32,8 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
       return;
     }
 
+    toast.info('Waiting for authentication...');
+
     // Poll for popup closure
     const pollTimer = window.setInterval(async () => {
       if (popup.closed) {
@@ -39,7 +41,9 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
         // Check if service is now active
         const response = await fetch('/api/services/status');
         const data = await response.json();
+        
         if (data.activeServices.includes(service)) {
+          toast.success(`Successfully connected to ${service}`);
           // Create a new AI message indicating success
           // Get service statuses
           const statusResponse = await fetch('/api/services/status');
@@ -61,6 +65,8 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
               }]
             })
           });
+        } else {
+          toast.error(`Failed to connect to ${service}. Please try again.`);
         }
         window.location.reload(); // Refresh to update auth state
       }
