@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { service: string } }
 ) {
   try {
-    const { service } = params;
+    const service = await params.service;
     let connection: string;
     
     switch (service) {
@@ -34,7 +34,6 @@ export async function GET(
       }
     });
 
-    // Add HTML content to close the window after successful auth
     const successHtml = `
       <html>
         <head>
