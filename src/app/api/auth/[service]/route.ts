@@ -31,34 +31,11 @@ export async function GET(
       authorizationParameters: {
         connection,
         redirectUri: `${process.env.APP_BASE_URL}/api/auth/callback`,
-        state: service // Pass service as state
+        //state: service // Pass service as state
       }
     })
 
-    const successHtml = `
-      <html>
-        <head>
-          <title>Authentication Complete</title>
-        </head>
-        <body>
-          <div style="text-align: center; padding: 20px;">
-            <h2>Authentication Successful!</h2>
-            <p>You can close this window now.</p>
-          </div>
-          <script>
-            setTimeout(() => {
-              window.close();
-            }, 1000);
-          </script>
-        </body>
-      </html>
-    `
-
-    return new Response(successHtml, {
-      headers: {
-        'Content-Type': 'text/html',
-      },
-    })
+    return response
 
   } catch (error) {
     console.error('Auth error:', error);
