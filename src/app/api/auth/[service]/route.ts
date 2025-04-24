@@ -31,6 +31,7 @@ export async function GET(
       authorizationParameters: {
         connection,
         redirectUri: `${process.env.APP_BASE_URL}/api/auth/callback`,
+        state: service // Pass service as state
       }
     })
 

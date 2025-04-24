@@ -13,10 +13,19 @@ export async function GET(request: NextRequest) {
       throw new Error('Missing code or state parameter');
     }
 
+    console.log('Callback received with state:', state);
+    
     // Complete the authentication flow
-    await auth0.handleCallback(request);
+    await auth0.handleCallback(request, {
+      redirectUri: `${process.env.APP_BASE_URL}/api/auth/callback`
+    });
+
+    if (!state) {
+      throw new Error('No state parameter received');
+    }
 
     const service = state as SupportedService;
+    console.log('Processing service:', service);
     
     if (service) {
       // Register the service
