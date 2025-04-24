@@ -27,11 +27,28 @@ export async function GET(
         );
     }
 
-    return auth0.startInteractiveLogin({
+    const response = await auth0.startInteractiveLogin({
       authorizationParameters: {
         connection,
         redirectUri: `${process.env.APP_BASE_URL}/api/auth/callback`,
       }
+    });
+
+    // Add HTML content to close the window after successful auth
+    const successHtml = `
+      <html>
+        <body>
+          <script>
+            window.close();
+          </script>
+        </body>
+      </html>
+    `;
+
+    return new Response(successHtml, {
+      headers: {
+        'Content-Type': 'text/html',
+      },
     });
 
   } catch (error) {

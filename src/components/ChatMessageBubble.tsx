@@ -38,6 +38,10 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     const pollTimer = window.setInterval(async () => {
       if (popup.closed) {
         window.clearInterval(pollTimer);
+        
+        // Wait a moment for service registration to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         // Check if service is now active
         const response = await fetch('/api/services/status');
         const data = await response.json();
