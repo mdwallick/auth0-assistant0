@@ -15,7 +15,7 @@ interface ChatMessageBubbleProps {
 export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBubbleProps) {
   
 
-  const handleAuthClick = (service: 'microsoft' | 'salesforce' | 'google') => {
+  const handleAuthClick = async (service: 'microsoft' | 'salesforce' | 'google') => {
     const width = 500;
     const height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
@@ -33,9 +33,27 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     }
 
     // Poll for popup closure
-    const pollTimer = window.setInterval(() => {
+    const pollTimer = window.setInterval(async () => {
       if (popup.closed) {
         window.clearInterval(pollTimer);
+        // Check if service is now active
+        const response = await fetch('/api/services/status');
+        const data = await response.json();
+        if (data.activeServices.includes(service)) {
+          // Create a new AI message indicating success
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messages: [{
+                role: 'assistant',
+                content: `Great! ${service.charAt(0).toUpperCase() + service.slice(1)} has been successfully connected. You can now use ${service}-related features. How can I help you?`
+              }]
+            })
+          });
+        }
         window.location.reload(); // Refresh to update auth state
       }
     }, 200);
