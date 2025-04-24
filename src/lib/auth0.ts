@@ -12,6 +12,20 @@ export const auth0 = new Auth0Client({
     },
 })
 
+// lib/auth0.ts
+import { initAuth0 } from '@auth0/nextjs-auth0/edge';
+
+export const auth = initAuth0({
+  secret: process.env.AUTH0_SECRET!,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL!,
+  baseURL: process.env.AUTH0_BASE_URL!,
+  clientID: process.env.AUTH0_CLIENT_ID!,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET!,
+  routes: {
+    callback: '/api/auth/callback',
+  },
+});
+
 // Initialize the service manager with auth0 client
 export const serviceManager = ServiceManager.initialize(auth0);
 
