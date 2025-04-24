@@ -1,7 +1,6 @@
-import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
+import { auth } from '@auth0/nextjs-auth0';
 
-export const GET = handleAuth({
-  login: handleLogin(req => {
+export const GET = auth.handleAuth((req) => {
     const { searchParams } = new URL(req.url);
     const screen_hint = searchParams.get('screen_hint') || undefined;
     const connection = searchParams.get('connection') || undefined;
