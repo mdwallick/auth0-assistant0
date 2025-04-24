@@ -7,6 +7,9 @@ export const auth0 = new Auth0Client({
     //     access_type: 'offline',
     //     prompt: 'consent',
     // },
+    routes: {
+        callback: '/api/auth/callback',
+    },
 })
 
 // Initialize the service manager with auth0 client
