@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { ServiceAuthDialog } from './ServiceAuthDialog';
+import { cn } from '@/utils/cn';
 
 interface ChatMessageBubbleProps {
   message: Message;
