@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
-import { serviceRegistry } from '@/lib/service-registry';
+import { serviceRegistry, type SupportedService } from '@/lib/service-registry';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,12 +16,13 @@ export async function GET(request: NextRequest) {
     // Complete the authentication flow
     await auth0.handleCallback(request);
 
-    // Extract service from state parameter (you may need to modify this based on your state format)
-    const service = state.split('_')[0];
+    const service = state as SupportedService;
     
     if (service) {
       // Register the service
-      await serviceRegistry.registerService(service);
+      serviceRegistry.registerService(service);
+      console.log(`Registered service: ${service}`);
+      console.log('Current active services:', serviceRegistry.getActiveServices());
     }
 
     // Return HTML that closes the popup and sends a message to the parent window
