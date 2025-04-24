@@ -118,13 +118,21 @@ export function ChatWindow(props: {
   emoji?: string;
 }) {
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedMessages = localStorage.getItem('chatHistory');
-      if (savedMessages) {
-        setInitialMessages(JSON.parse(savedMessages));
+      try {
+        const savedMessages = localStorage.getItem('chatHistory');
+        if (savedMessages) {
+          const parsedMessages = JSON.parse(savedMessages);
+          setInitialMessages(Array.isArray(parsedMessages) ? parsedMessages : []);
+        }
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+        localStorage.removeItem('chatHistory'); // Clear invalid data
       }
+      setIsLoading(false);
     }
   }, []);
 
@@ -169,7 +177,11 @@ export function ChatWindow(props: {
         className="absolute inset-0"
         contentClassName="py-8 px-2"
         content={
-          chat.messages.length === 0 ? (
+          isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <LoaderCircle className="animate-spin" />
+            </div>
+          ) : chat.messages.length === 0 ? (
             <div>{props.emptyStateComponent}</div>
           ) : (
             <ChatMessages
