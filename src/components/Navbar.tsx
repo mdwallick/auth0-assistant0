@@ -24,6 +24,15 @@ export const ActiveLink = (props: { href: string; children: ReactNode }) => {
 };
 
 export function Navbar() {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => setUser(data))
+      .catch(console.error);
+  }, []);
+
   const clearChat = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('chatHistory');
@@ -34,7 +43,20 @@ export function Navbar() {
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-4">
-        
+        {user && (
+          <div className="flex items-center gap-2">
+            {user.picture && (
+              <Image 
+                src={user.picture} 
+                alt="Profile" 
+                width={32} 
+                height={32} 
+                className="rounded-full"
+              />
+            )}
+            <span>{user.name}</span>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={clearChat}>
