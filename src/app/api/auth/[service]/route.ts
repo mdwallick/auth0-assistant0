@@ -7,9 +7,10 @@ export async function GET(
   { params }: { params: { service: string } }
 ) {
   try {
+    const { service } = await params
     let connection: string
     
-    switch (params.service) {
+    switch (service) {
       case 'microsoft':
         connection = 'windowslive'
         break
