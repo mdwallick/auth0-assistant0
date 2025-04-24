@@ -41,6 +41,14 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
         const data = await response.json();
         if (data.activeServices.includes(service)) {
           // Create a new AI message indicating success
+          // Get service statuses
+          const statusResponse = await fetch('/api/services/status');
+          const statusData = await statusResponse.json();
+          
+          const serviceStatusList = ['microsoft', 'salesforce', 'google']
+            .map(s => `- ${s.charAt(0).toUpperCase() + s.slice(1)}: ${statusData.activeServices.includes(s) ? '✅ Connected' : '❌ Not connected'}`)
+            .join('\n');
+
           const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -49,7 +57,7 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
             body: JSON.stringify({
               messages: [{
                 role: 'assistant',
-                content: `Great! ${service.charAt(0).toUpperCase() + service.slice(1)} has been successfully connected. You can now use ${service}-related features. How can I help you?`
+                content: `Great! ${service.charAt(0).toUpperCase() + service.slice(1)} has been successfully connected.\n\nCurrent service status:\n${serviceStatusList}\n\nHow can I help you?`
               }]
             })
           });
