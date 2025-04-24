@@ -2,7 +2,7 @@
 
 import { type Message } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
@@ -119,8 +119,12 @@ export function ChatWindow(props: {
 }) {
   const chat = useChat({
     api: props.endpoint,
+    initialMessages: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : [],
     onFinish(response) {
       console.log('Final response: ', response?.content);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('chatHistory', JSON.stringify(chat.messages));
+      }
     },
     onResponse(response) {
       console.log('Response received. Status:', response.status);
@@ -130,6 +134,13 @@ export function ChatWindow(props: {
       toast.error(`Error while processing your request`, { description: e.message });
     },
   });
+
+  // Save messages when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chatHistory', JSON.stringify(chat.messages));
+    }
+  }, [chat.messages]);
 
   function isChatLoading(): boolean {
     return chat.isLoading;
