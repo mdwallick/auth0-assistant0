@@ -48,6 +48,41 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
         
         if (data.activeServices.includes(service)) {
           toast.success(`Successfully connected to ${service}`);
+          
+          // Get service statuses and format them
+          const serviceStatusList = ['microsoft', 'salesforce', 'google']
+            .map(s => `- ${s.charAt(0).toUpperCase() + s.slice(1)}: ${data.activeServices.includes(s) ? '✅ Connected' : '❌ Not connected'}`)
+            .join('\n');
+          
+          // Add new message to show success and service statuses
+          onNewMessage({
+            role: 'assistant',
+            content: `Authentication successful! Here are the current service statuses:\n\n${serviceStatusList}`
+          });
+        } else {
+          toast.error(`Failed to connect to ${service}`);
+          onNewMessage({
+            role: 'assistant',
+            content: `Failed to authenticate with ${service}. Please try again.`
+          });
+        }
+      }
+    }, 200);
+
+    // Poll for popup closure
+    const pollTimer = window.setInterval(async () => {
+      if (popup.closed) {
+        window.clearInterval(pollTimer);
+        
+        // Wait a moment for service registration to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check if service is now active
+        const response = await fetch('/api/services/status');
+        const data = await response.json();
+        
+        if (data.activeServices.includes(service)) {
+          toast.success(`Successfully connected to ${service}`);
           // Create a new AI message indicating success
           // Get service statuses
           const statusResponse = await fetch('/api/services/status');

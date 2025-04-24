@@ -37,9 +37,18 @@ export async function GET(
     // Add HTML content to close the window after successful auth
     const successHtml = `
       <html>
+        <head>
+          <title>Authentication Complete</title>
+        </head>
         <body>
+          <div style="text-align: center; padding: 20px;">
+            <h2>Authentication Successful!</h2>
+            <p>You can close this window now.</p>
+          </div>
           <script>
-            window.close();
+            setTimeout(() => {
+              window.close();
+            }, 1000);
           </script>
         </body>
       </html>
