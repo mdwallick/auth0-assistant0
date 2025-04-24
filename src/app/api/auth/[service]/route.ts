@@ -1,8 +1,3 @@
-
-import { ServiceManager } from '@/lib/service-manager'
-import type { SupportedService } from '@/lib/service-manager'
-
-
 import { NextRequest, NextResponse } from 'next/server'
 import { auth0 } from '@/lib/auth0'
 
@@ -30,19 +25,14 @@ export async function POST(
         )
     }
 
-    const { url } = await auth0.startInteractiveLogin({
+    return auth0.startInteractiveLogin({
       authorizationParameters: {
         connection,
-        redirectUri: `${process.env.APP_BASE_URL}/auth/callback`,
-        scope: 'openid profile email offline_access',
+        redirectUri: `${process.env.APP_BASE_URL}/api/auth/callback`,
+        //scope: 'openid profile email offline_access',
       }
     })
 
-    // Register the service after successful authentication
-    const serviceManager = ServiceManager.getInstance()
-    serviceManager.registerService(service as SupportedService)
-
-    return NextResponse.json({ authUrl: url })
   } catch (error) {
     console.error('Auth error:', error)
     return NextResponse.json(
