@@ -117,9 +117,20 @@ export function ChatWindow(props: {
   placeholder?: string;
   emoji?: string;
 }) {
+  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedMessages = localStorage.getItem('chatHistory');
+      if (savedMessages) {
+        setInitialMessages(JSON.parse(savedMessages));
+      }
+    }
+  }, []);
+
   const chat = useChat({
     api: props.endpoint,
-    initialMessages: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : [],
+    initialMessages,
     onFinish(response) {
       console.log('Final response: ', response?.content);
       if (typeof window !== 'undefined') {
