@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -10,31 +11,29 @@ interface ServiceAuthProps {
 
 export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
   const handleAuth = async () => {
-    let connection: string
-    let scopes: string
-    
-    switch (service) {
-      case 'microsoft':
-        connection = 'windowslive';
-        scopes = 'openid profile email offline_access User.Read Mail.Read Mail.ReadWrite Calendars.ReadWrite Files.ReadWrite.All';
-        break;
-      case 'salesforce':
-        connection = 'salesforce-dev';
-        scopes = 'openid profile email offline_access api';
-        break;
-      case 'google':
-        connection = 'google-oauth2';
-        scopes = 'openid profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar';
-        break;
-      default:
-        throw new Error(`Invalid service ${service}`);
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      `/api/auth/${service}`,
+      'Auth0 Login',
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+    );
+
+    if (!popup) {
+      toast.error('Please enable popups for this site');
+      return;
     }
 
-    try {
-      window.location.href = `/auth/login?connection=${connection}&scope=${scopes}`;
-    } catch (error: any) {
-      toast.error(`Authentication failed: ${error.message}`);
-    }
+    // Poll for popup closure
+    const pollTimer = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(pollTimer);
+        window.location.reload(); // Refresh to update auth state
+      }
+    }, 200);
   };
 
   return (
