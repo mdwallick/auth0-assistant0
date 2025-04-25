@@ -23,7 +23,7 @@ function ChatMessages(props: {
 }) {
   return (
     <div className="flex flex-col max-w-[1200px] mx-auto pb-12 w-full">
-      <div className="grid grid-cols-[1fr,400px] gap-4">
+      <div className="w-full">
         <div className="overflow-y-auto">
           {props.messages.map((m, i) => {
             return <ChatMessageBubble 
@@ -33,9 +33,6 @@ function ChatMessages(props: {
               isLoading={m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming} 
             />;
           })}
-        </div>
-        <div className="h-[calc(100vh-8rem)] sticky top-4">
-          <TokenDisplay />
         </div>
       </div>
     </div>

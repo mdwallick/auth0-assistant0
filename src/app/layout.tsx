@@ -60,8 +60,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </div>
           <Navbar />
-          <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
-            <div className="absolute inset-0">{children}</div>
+          <div className="grid grid-cols-[1fr,400px] h-[calc(100vh-8rem)]">
+            <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
+              <div className="absolute inset-0">{children}</div>
+            </div>
+            {session && (
+              <div className="p-4">
+                <TokenDisplay />
+              </div>
+            )}
           </div>
         </div>
         <Toaster />
