@@ -54,7 +54,9 @@ export function Navbar() {
                 className="rounded-full"
               />
             )}
-            <span>{user.name}</span>
+            <a href="/profile" className="flex items-center gap-2">
+              <span>{user.name}</span>
+            </a>
           </div>
         )}
       </div>

@@ -42,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </nav>
             </div>
             <div className="flex justify-center">
-              {session && (
+              {/* {session && (
                 <>
                   <Button asChild variant="ghost" size="default" className="text-white">
                     <a href="/profile" className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </a>
                   </Button>
                 </>
-              )}
+              )} */}
             </div>
           </div>
           <Navbar />
