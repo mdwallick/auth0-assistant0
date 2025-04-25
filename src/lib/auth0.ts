@@ -36,13 +36,25 @@ export const auth0 = new Auth0Client();
 
 export async function getConnectedServices(): Promise<SupportedService[]> {
   const session = await auth0.getSession();
-  const connectedServices = session?.user?.connected_services || [];
-  console.log('Connected services:', connectedServices);
-  const auth0Connections = connectedServices.map(cs => cs.connection);
-  
-  return auth0Connections
-    .map(connection => AUTH0_TO_SERVICE_MAP[connection as Auth0Connection])
-    .filter((service): service is SupportedService => service !== undefined);
+  if (!session?.tokenSet?.idToken) return [];
+
+  try {
+    // Decode ID token (it's a JWT)
+    const parts = session.tokenSet.idToken.split('.');
+    if (parts.length !== 3) return [];
+    
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    const connectedServices = payload.connected_services || [];
+    console.log('Connected services from ID token:', connectedServices);
+    
+    const auth0Connections = connectedServices.map(cs => cs.connection);
+    return auth0Connections
+      .map(connection => AUTH0_TO_SERVICE_MAP[connection as Auth0Connection])
+      .filter((service): service is SupportedService => service !== undefined);
+  } catch (error) {
+    console.error('Error parsing ID token:', error);
+    return [];
+  }
 }
 
 export async function getAccessToken(service: SupportedService): Promise<string> {
