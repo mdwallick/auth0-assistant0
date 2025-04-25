@@ -33,7 +33,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
 
       const userResponse = await fetch('/api/auth/me')
       const userData = await userResponse.json()
-      const userId = userData?.sub || ''
+      const userId = encodeURIComponent(userData?.sub) || ''
 
       const popup = window.open(
         `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
@@ -61,7 +61,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
       await new Promise(resolve => setTimeout(resolve, 3000))
       setIsActive(true)
       toast.success(`Successfully connected to ${service}!`)
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Failed to connect to ${service}: ${error.message}`)
     }
   }
