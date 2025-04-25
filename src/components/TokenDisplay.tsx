@@ -1,10 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+
+function decodeJwt(token: string) {
+  try {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch (err) {
+    return null;
+  }
+}
 
 export function TokenDisplay() {
-  const [session, setSession] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [session, setSession] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -40,21 +51,17 @@ export function TokenDisplay() {
     );
   }
 
+  const decoded_jwt = session ? decodeJwt(session.id_token) : null
+  
   return (
-    <>
     <div className="bg-black/10 p-4 rounded-lg w-full h-full overflow-hidden">
       <h3 className="font-mono text-sm mb-2">Session Data:</h3>
       <pre className="text-xs overflow-auto h-[calc(100%-2rem)]">
         {JSON.stringify(session, null, 2)}
+        <br/><br/>
+        {JSON.stringify(decoded_jwt, null, 2)}
       </pre>
-    </div>
 
-  <div className="bg-black/10 p-4 rounded-lg w-full h-full overflow-hidden">
-    <h3 className="font-mono text-sm mb-2">Session Data:</h3>
-    <pre className="text-xs overflow-auto h-[calc(100%-2rem)]">
-      {JSON.stringify(session.id_token, null, 2)}
-    </pre>
-  </div>
-      </>
+    </div>
 );
 }

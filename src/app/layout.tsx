@@ -1,12 +1,13 @@
 import './globals.css';
 import { Roboto_Mono, Inter } from 'next/font/google';
 import Image from 'next/image';
-import { LogOut } from 'lucide-react';
+//import { LogOut } from 'lucide-react';
 
 import { ActiveLink, Navbar } from '@/components/Navbar';
-import { Button } from '@/components/ui/button';
+//import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { auth0 } from '@/lib/auth0';
+import { TokenDisplay } from '@/components/TokenDisplay'
 
 const robotoMono = Roboto_Mono({ weight: '400', subsets: ['latin'] });
 const publicSans = Inter({ weight: '400', subsets: ['latin'] });
