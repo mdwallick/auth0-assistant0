@@ -1,17 +1,15 @@
+
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
-
-type Service = 'microsoft' | 'salesforce' | 'google'
+import type { SupportedService } from '@/lib/auth0'
 
 interface ServiceAuthProps {
-  service: Service
+  service: SupportedService
+  isActive: boolean
 }
 
-export function ServiceAuth({ service }: ServiceAuthProps) {
-  const connectedServices = useConnectedServices()
-  const isActive = connectedServices.includes(service)
-
+export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
   const handleAuth = async () => {
     const width = 500
     const height = 600
