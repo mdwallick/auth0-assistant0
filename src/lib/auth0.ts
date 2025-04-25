@@ -37,6 +37,7 @@ export const auth0 = new Auth0Client();
 export async function getConnectedServices(): Promise<SupportedService[]> {
   const session = await auth0.getSession();
   const connectedServices = session?.user?.connected_services || [];
+  console.log('Connected services:', connectedServices);
   const auth0Connections = connectedServices.map(cs => cs.connection);
   
   return auth0Connections
