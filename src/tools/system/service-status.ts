@@ -1,20 +1,20 @@
 
 import { tool } from '@langchain/core/tools'
-import { serviceRegistry } from '@/lib/service-registry'
-import type { SupportedService } from '@/lib/service-registry'
+import { auth0, type SupportedService } from '@/lib/auth0'
 
 export const ServiceStatusTool = tool(
     async () => {
-        const activeServices = serviceRegistry.getActiveServices()
+        const session = await auth0.getSession()
+        const connectedServices = session?.user?.connected_services || []
         const allServices: SupportedService[] = ['microsoft', 'salesforce', 'google']
         
         const status = allServices.map(service => ({
             service,
-            status: activeServices.includes(service) ? 'active' : 'not registered'
+            status: connectedServices.includes(service) ? 'active' : 'not registered'
         }))
 
         return JSON.stringify({
-            activeServices,
+            activeServices: connectedServices,
             status
         })
     },
