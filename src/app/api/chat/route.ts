@@ -39,6 +39,8 @@ import {
     SalesforceSearchTool 
 } from '@/tools/salesforce';
 
+import { auth0, getConnectedServices } from '@/lib/auth0';
+
 const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
@@ -65,9 +67,8 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 
 const getAvailableTools = async () => {
     const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool];
-    
-    const session = await auth0.getSession();
-    const connectedServices = session?.user?.connected_services || [];
+
+    const connectedServices = await getConnectedServices();
     const activeServices = connectedServices.map(connection => {
         if (connection === 'windowslive') return 'microsoft';
         if (connection === 'google-oauth2') return 'google';
@@ -106,7 +107,7 @@ const getAvailableTools = async () => {
     //       credentials: { accessToken, calendarId: 'primary' },
     //       //model: llm,
     //     };
-        
+
     //     tools.push(
     //         new GmailSearch(gmailParams),
     //         new GmailCreateDraft(gmailParams),
@@ -114,7 +115,7 @@ const getAvailableTools = async () => {
     //         new GoogleCalendarViewTool(googleCalendarParams)
     //     );
     // }
-    
+
     return tools;
 };
 
