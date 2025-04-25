@@ -15,7 +15,7 @@ const AUTH0_TO_SERVICE_MAP: Record<Auth0Connection, SupportedService> = {
   'salesforce-dev': 'salesforce'
 }
 
-const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
+export const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   microsoft: { connection: 'windowslive' },
   salesforce: { connection: 'salesforce-dev' },
   google: { connection: 'google-oauth2' }

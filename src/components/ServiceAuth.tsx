@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { SERVICE_CONFIGS } from '@/lib/auth0'
 import type { SupportedService } from '@/lib/auth0'
 
 interface ServiceAuthProps {
