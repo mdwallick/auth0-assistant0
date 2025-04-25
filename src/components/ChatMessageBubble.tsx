@@ -12,8 +12,6 @@ interface ChatMessageBubbleProps {
 }
 
 export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBubbleProps) {
-  
-
   const handleAuthClick = async (service: 'microsoft' | 'salesforce' | 'google') => {
     const width = 500;
     const height = 600;
@@ -24,36 +22,6 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     const messageHandler = async (event: MessageEvent) => {
       if (event.data.type === 'AUTH_COMPLETE') {
         window.removeEventListener('message', messageHandler);
-        
-        // Check if service is now active
-        const response = await fetch('/api/services/status');
-        const data = await response.json();
-        
-        if (data.activeServices.includes(event.data.service)) {
-          toast.success(`Successfully connected to ${event.data.service}`);
-          
-          // Get updated service statuses
-          const statusResponse = await fetch('/api/services/status');
-          const statusData = await statusResponse.json();
-          
-          const serviceStatusList = ['microsoft', 'salesforce', 'google']
-            .map(s => `- ${s.charAt(0).toUpperCase() + s.slice(1)}: ${statusData.activeServices.includes(s) ? '✅ Connected' : '❌ Not connected'}`)
-            .join('\n');
-
-          // Create success message
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              messages: [{
-                role: 'assistant',
-                content: `Great! ${event.data.service.charAt(0).toUpperCase() + event.data.service.slice(1)} has been successfully connected.\n\nCurrent service status:\n${serviceStatusList}\n\nHow can I help you?`
-              }]
-            })
-          });
-        }
       } else if (event.data.type === 'AUTH_ERROR') {
         window.removeEventListener('message', messageHandler);
         toast.error(`Failed to connect: ${event.data.error}`);
@@ -63,7 +31,7 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     window.addEventListener('message', messageHandler);
 
     const popup = window.open(
-      `/api/auth/${service}`,
+      `/auth/login?connection=${service}`,
       'Auth0 Login',
       `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
     );
@@ -81,38 +49,8 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
         window.clearInterval(pollTimer);
         
         // Wait a moment for service registration to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         
-        // Check if service is now active
-        const response = await fetch('/api/services/status');
-        const data = await response.json();
-        
-        if (data.activeServices.includes(service)) {
-          toast.success(`Successfully connected to ${service}`);
-          // Create a new AI message indicating success
-          // Get service statuses
-          const statusResponse = await fetch('/api/services/status');
-          const statusData = await statusResponse.json();
-          
-          const serviceStatusList = ['microsoft', 'salesforce', 'google']
-            .map(s => `- ${s.charAt(0).toUpperCase() + s.slice(1)}: ${statusData.activeServices.includes(s) ? '✅ Connected' : '❌ Not connected'}`)
-            .join('\n');
-
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              messages: [{
-                role: 'assistant',
-                content: `Great! ${service.charAt(0).toUpperCase() + service.slice(1)} has been successfully connected.\n\nCurrent service status:\n${serviceStatusList}\n\nHow can I help you?`
-              }]
-            })
-          });
-        } else {
-          toast.error(`Failed to connect to ${service}. Please try again.`);
-        }
         window.location.reload(); // Refresh to update auth state
       }
     }, 200);
