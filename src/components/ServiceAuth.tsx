@@ -1,10 +1,10 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { SERVICE_CONFIGS } from '@/lib/auth0'
-import type { SupportedService } from '@/lib/auth0'
+import { SERVICE_CONFIGS } from '@/lib/services'
+
+import type { SupportedService } from '@/lib/services'
 
 interface ServiceAuthProps {
   service: SupportedService

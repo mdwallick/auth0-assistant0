@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import { usePathname } from 'next/navigation';
-import { ReactNode, useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { usePathname } from 'next/navigation'
+import { ReactNode, useState, useEffect } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { cn } from '@/utils/cn'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
 export const ActiveLink = (props: { href: string; children: ReactNode }) => {
-  const pathname = usePathname();
+  const pathname = usePathname()
   return (
     <Link
       href={props.href}
@@ -20,8 +20,8 @@ export const ActiveLink = (props: { href: string; children: ReactNode }) => {
     >
       {props.children}
     </Link>
-  );
-};
+  )
+}
 
 export function Navbar() {
   const [user, setUser] = useState(null);
@@ -30,15 +30,16 @@ export function Navbar() {
     fetch('/api/auth/me')
       .then(res => res.json())
       .then(data => setUser(data))
-      .catch(console.error);
-  }, []);
+      .catch(console.error)
+  }, [])
 
   const clearChat = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatHistory');
-      window.location.reload();
+      localStorage.removeItem('chatHistory')
+      //window.location.reload()
+      window.location.href = '/'
     }
-  };
+  }
 
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">

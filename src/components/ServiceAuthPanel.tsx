@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ServiceAuth } from './ServiceAuth'
-import type { SupportedService } from '@/lib/auth0'
+import type { SupportedService } from '@/lib/services'
 
 export function ServiceAuthPanel() {
   const [connectedServices, setConnectedServices] = useState<SupportedService[]>([])

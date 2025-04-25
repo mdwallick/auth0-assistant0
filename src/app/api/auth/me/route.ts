@@ -13,7 +13,6 @@ export async function GET() {
     connected_services: session.user['connected_services'] || [],
     id_token: session.tokenSet?.idToken || null,
   }
-
-  //console.log('Full Session:', response)
+  
   return NextResponse.json(response)
 }
