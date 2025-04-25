@@ -32,10 +32,14 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
 
       const userResponse = await fetch('/api/auth/me')
       const userData = await userResponse.json()
-      const userId = encodeURIComponent(userData?.sub || '')
+      const extUserId = userData?.sub || ''
+      const userId = encodeURIComponent(extUserId.replace('|', ':'))
 
+      const popup_url = `/auth/login?connection=${service}&ext-primary-user-id=${userId}`
+      console.log('popup_url', popup_url)
+      
       const popup = window.open(
-        `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
+        popup_url,
         'Auth0 Login',
         `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
       )
