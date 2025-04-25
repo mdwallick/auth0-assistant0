@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -41,9 +42,11 @@ export function TokenDisplay() {
   }
 
   return (
-    <div className="bg-black/10 p-4 rounded-lg w-full h-full overflow-hidden">
+    <div className="bg-black/10 p-4 rounded-lg w-full h-[calc(100vh-20rem)] flex flex-col">
       <h3 className="font-mono text-sm mb-2">Session Data:</h3>
-      <pre className="text-xs overflow-auto h-[calc(100%-2rem)]">{JSON.stringify(session, null, 2)}</pre>
+      <div className="flex-1 overflow-auto">
+        <pre className="text-xs">{JSON.stringify(session, null, 2)}</pre>
+      </div>
     </div>
   )
 }
