@@ -17,7 +17,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
       .then(res => res.json())
       .then(data => {
         const connectedServices = data.connected_services || []
-        setIsActive(connectedServices.some(cs => cs.provider === service))
+        setIsActive(connectedServices.some(cs => cs.connection === SERVICE_CONFIGS[service].connection))
       })
       .catch(console.error)
   }, [service])

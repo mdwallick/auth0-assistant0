@@ -44,7 +44,7 @@ export const auth0 = new Auth0Client({
       },
     }
   },
-  
+
   // Handle callback to modify session
   // async onCallback(error, context, session: Auth0Session | null) {
   //   // If there's an error during the callback
@@ -101,12 +101,13 @@ export async function getAccessToken(service: SupportedService): Promise<string>
 }
 
 function decodeJwt(token: string | null) {
-  if (token) {
+  if (!token) return null;
+  try {
     const payload = token.split('.')[1];
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     const json = atob(base64);
     return JSON.parse(json);
-  } else {
+  } catch (err) {
     return null;
   }
 }
