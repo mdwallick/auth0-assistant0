@@ -63,10 +63,19 @@ Use Salesforce tools to query or create records in Salesforce.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `;
 
-const getAvailableTools = () => {
+const getAvailableTools = async () => {
     const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool];
     
-    if (serviceRegistry.isServiceActive('microsoft')) {
+    const session = await auth0.getSession();
+    const connectedServices = session?.user?.connected_services || [];
+    const activeServices = connectedServices.map(connection => {
+        if (connection === 'windowslive') return 'microsoft';
+        if (connection === 'google-oauth2') return 'google';
+        if (connection === 'salesforce-dev') return 'salesforce';
+        return undefined;
+    }).filter((service): service is SupportedService => service !== undefined);
+
+    if (activeServices.includes('microsoft')) {
         tools.push(
             MicrosoftCalendarReadTool,
             MicrosoftCalendarWriteTool,
@@ -78,7 +87,7 @@ const getAvailableTools = () => {
         );
     }
 
-    if (serviceRegistry.isServiceActive('salesforce')) {
+    if (activeServices.includes('salesforce')) {
         tools.push(
             SalesforceQueryTool,
             SalesforceCreateTool,
@@ -123,7 +132,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const tools = getAvailableTools();
+        const tools = await getAvailableTools();
 
         const llm = new ChatOpenAI({
             modelName: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
