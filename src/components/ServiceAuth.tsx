@@ -1,15 +1,26 @@
 
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 type Service = 'microsoft' | 'salesforce' | 'google';
 
 interface ServiceAuthProps {
   service: Service;
-  isActive: boolean;
 }
 
-export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
+export function ServiceAuth({ service }: ServiceAuthProps) {
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(user => {
+        setIsActive(user.connected_services?.includes(service) || false);
+      })
+      .catch(console.error);
+  }, [service]);
+
   const handleAuth = async () => {
     const width = 500;
     const height = 600;
@@ -27,11 +38,10 @@ export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
       return;
     }
 
-    // Poll for popup closure
     const pollTimer = window.setInterval(() => {
       if (popup.closed) {
         window.clearInterval(pollTimer);
-        window.location.reload(); // Refresh to update auth state
+        window.location.reload();
       }
     }, 200);
   };

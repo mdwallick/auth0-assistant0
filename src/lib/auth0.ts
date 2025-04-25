@@ -1,21 +1,35 @@
+
 import { Auth0Client } from '@auth0/nextjs-auth0/server';
-import { ServiceManager } from './service-manager';
 
-export const auth0 = new Auth0Client({
-    // this is required to get federated access tokens from services like Google
-    // authorizationParameters: {
-    //     access_type: 'offline',
-    //     prompt: 'consent',
-    // },
-    routes: {
-        callback: '/api/auth/callback',
-    },
-})
+export type SupportedService = 'microsoft' | 'salesforce' | 'google';
 
-// Initialize the service manager with auth0 client
-export const serviceManager = ServiceManager.initialize(auth0);
+interface ServiceConfig {
+  connection: string;
+  scope?: string;
+}
 
-// Helper functions for getting access tokens
-export const getGoogleAccessToken = () => serviceManager.getAccessToken('google');
-export const getMicrosoftAccessToken = () => serviceManager.getAccessToken('microsoft');
-export const getSalesforceAccessToken = () => serviceManager.getAccessToken('salesforce');
+const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
+  microsoft: { connection: 'windowslive' },
+  salesforce: { connection: 'salesforce-dev' },
+  google: { connection: 'google-oauth2' }
+};
+
+export const auth0 = new Auth0Client();
+
+export async function getConnectedServices(): Promise<SupportedService[]> {
+  const session = await auth0.getSession();
+  return session?.user?.connected_services || [];
+}
+
+export async function getAccessToken(service: SupportedService): Promise<string> {
+  const config = SERVICE_CONFIGS[service];
+  if (!config) {
+    throw new Error(`Unsupported service: ${service}`);
+  }
+
+  const { token } = await auth0.getAccessTokenForConnection({
+    connection: config.connection,
+  });
+
+  return token;
+}
