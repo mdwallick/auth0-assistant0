@@ -2,8 +2,8 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { Client, ResponseType } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
-import { getMicrosoftAccessToken } from '@/lib/auth0';
-//import pdf from 'pdf-parse'
+import { getMicrosoftAccessToken } from './auth'
+
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 

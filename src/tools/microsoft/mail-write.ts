@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
-import { getMicrosoftAccessToken } from '@/lib/auth0'
+import { getMicrosoftAccessToken } from './auth'
 
 const toolSchema = z.object({
     subject: z.string().describe('Subject of the email'),

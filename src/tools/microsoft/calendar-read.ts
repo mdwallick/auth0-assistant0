@@ -1,7 +1,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
-import { getMicrosoftAccessToken } from '@/lib/auth0'
+import { getMicrosoftAccessToken } from './auth'
 
 const toolSchema = z.object({
     timeMin: z.string().datetime().describe('Start time in ISO 8601 format'),
