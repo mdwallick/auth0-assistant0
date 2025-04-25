@@ -155,7 +155,7 @@ export function ChatWindow(props: {
       const userId = encodeURIComponent(userData?.sub || '')
 
       const popup = window.open(
-        `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
+        `/auth/login?connection=${SERVICE_CONFIGS[service].connection}&ext-primary-user-id=${userId}`,
         'Auth0 Login',
         `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
       )

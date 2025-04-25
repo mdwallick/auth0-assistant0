@@ -35,7 +35,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
       const extUserId = userData?.sub || ''
       const userId = encodeURIComponent(extUserId.replace('|', ':'))
 
-      const popup_url = `/auth/login?connection=${service}&ext-primary-user-id=${userId}`
+      const popup_url = `/auth/login?connection=${SERVICE_CONFIGS[service].connection}&ext-primary-user-id=${userId}`
       console.log('popup_url', popup_url)
       
       const popup = window.open(
