@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react'
 import { ServiceAuth } from './ServiceAuth'
 
 export function ServiceAuthPanel() {
-  const activeServices = useConnectedServices();
+  const activeServices = useConnectedServices()
 
   return (
     <div className="p-4 space-y-2 border rounded-lg">

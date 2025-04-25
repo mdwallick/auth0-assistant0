@@ -1,90 +1,93 @@
-import type { Message } from 'ai';
-import { MemoizedMarkdown } from './MemoizedMarkdown';
-import { Button } from './ui/button';
-import { LoaderCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import { cn } from '@/utils/cn';
+import type { Message } from 'ai'
+import { MemoizedMarkdown } from './MemoizedMarkdown'
+import { Button } from './ui/button'
+import { LoaderCircle } from 'lucide-react'
+import { toast } from 'sonner'
+import { cn } from '@/utils/cn'
 
 interface ChatMessageBubbleProps {
-  message: Message;
-  aiEmoji?: string;
-  isLoading?: boolean;
+  message: Message
+  aiEmoji?: string
+  isLoading?: boolean
 }
 
 export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBubbleProps) {
   const handleAuthClick = async (service: 'microsoft' | 'salesforce' | 'google') => {
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
+    const width = 500
+    const height = 600
+    const left = window.screenX + (window.outerWidth - width) / 2
+    const top = window.screenY + (window.outerHeight - height) / 2
 
     // Set up message listener
     const messageHandler = async (event: MessageEvent) => {
       if (event.data.type === 'AUTH_COMPLETE') {
-        window.removeEventListener('message', messageHandler);
+        window.removeEventListener('message', messageHandler)
       } else if (event.data.type === 'AUTH_ERROR') {
-        window.removeEventListener('message', messageHandler);
-        toast.error(`Failed to connect: ${event.data.error}`);
+        window.removeEventListener('message', messageHandler)
+        toast.error(`Failed to connect: ${event.data.error}`)
       }
-    };
+    }
 
-    window.addEventListener('message', messageHandler);
+    window.addEventListener('message', messageHandler)
 
     const popup = window.open(
       `/auth/login?connection=${service}`,
       'Auth0 Login',
-      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
-    );
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
+    )
 
     if (!popup) {
-      toast.error('Please enable popups for this site');
-      return;
+      toast.error('Please enable popups for this site')
+      return
     }
 
-    toast.info('Waiting for authentication...');
+    toast.info('Waiting for authentication...')
 
     // Poll for popup closure
     const pollTimer = window.setInterval(async () => {
       if (popup.closed) {
-        window.clearInterval(pollTimer);
-        
+        window.clearInterval(pollTimer)
+
         // Wait a moment for service registration to complete
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        
-        window.location.reload(); // Refresh to update auth state
+        await new Promise((resolve) => setTimeout(resolve, 3000))
+
+        window.location.reload() // Refresh to update auth state
       }
-    }, 200);
-  };
+    }, 200)
+  }
 
   // Check if message contains service connection request
   const checkForServiceRequest = (content: string) => {
-    const lowerContent = content.toLowerCase();
-    if (lowerContent.includes('microsoft') && (
-      lowerContent.includes('connect') || 
-      lowerContent.includes('authenticate') || 
-      lowerContent.includes('login') ||
-      lowerContent.includes('sign in')
-    )) {
-      return 'microsoft';
-    } else if (lowerContent.includes('salesforce') && (
-      lowerContent.includes('connect') || 
-      lowerContent.includes('authenticate') ||
-      lowerContent.includes('login') ||
-      lowerContent.includes('sign in')
-    )) {
-      return 'salesforce';
-    } else if (lowerContent.includes('google') && (
-      lowerContent.includes('connect') || 
-      lowerContent.includes('authenticate') ||
-      lowerContent.includes('login') ||
-      lowerContent.includes('sign in')
-    )) {
-      return 'google';
+    const lowerContent = content.toLowerCase()
+    if (
+      lowerContent.includes('microsoft') &&
+      (lowerContent.includes('connect') ||
+        lowerContent.includes('authenticate') ||
+        lowerContent.includes('login') ||
+        lowerContent.includes('sign in'))
+    ) {
+      return 'microsoft'
+    } else if (
+      lowerContent.includes('salesforce') &&
+      (lowerContent.includes('connect') ||
+        lowerContent.includes('authenticate') ||
+        lowerContent.includes('login') ||
+        lowerContent.includes('sign in'))
+    ) {
+      return 'salesforce'
+    } else if (
+      lowerContent.includes('google') &&
+      (lowerContent.includes('connect') ||
+        lowerContent.includes('authenticate') ||
+        lowerContent.includes('login') ||
+        lowerContent.includes('sign in'))
+    ) {
+      return 'google'
     }
-    return null;
-  };
+    return null
+  }
 
-  const service = message.role === 'assistant' ? checkForServiceRequest(message.content) : null;
+  const service = message.role === 'assistant' ? checkForServiceRequest(message.content) : null
 
   return (
     <>
@@ -107,30 +110,26 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
               <span>Thinking...</span>
             </div>
           ) : (
-            <MemoizedMarkdown 
+            <MemoizedMarkdown
               components={{
-                button: ({node, ...props}) => {
-                  const service = props.className?.includes('microsoft') 
-                    ? 'microsoft' 
+                button: ({ node, ...props }) => {
+                  const service = props.className?.includes('microsoft')
+                    ? 'microsoft'
                     : props.className?.includes('salesforce')
-                    ? 'salesforce'
-                    : props.className?.includes('google')
-                    ? 'google'
-                    : null;
+                      ? 'salesforce'
+                      : props.className?.includes('google')
+                        ? 'google'
+                        : null
 
                   if (service) {
                     return (
-                      <Button
-                        variant="outline"
-                        onClick={() => handleServiceAuth(service)}
-                        className="mt-2"
-                      >
+                      <Button variant="outline" onClick={() => handleServiceAuth(service)} className="mt-2">
                         Connect {service}
                       </Button>
-                    );
+                    )
                   }
-                  return <Button {...props} />;
-                }
+                  return <Button {...props} />
+                },
               }}
             >
               {message.content}
@@ -145,7 +144,6 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
           </div>
         )}
       </div>
-      
     </>
-  );
+  )
 }

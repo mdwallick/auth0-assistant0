@@ -1,27 +1,27 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server'
 
-import { auth0 } from '@/lib/auth0';
+import { auth0 } from '@/lib/auth0'
 
 /**
  * Middleware to handle authentication using Auth0
  */
 export async function middleware(request: NextRequest) {
-  const authRes = await auth0.middleware(request);
+  const authRes = await auth0.middleware(request)
 
   // authentication routes — let the middleware handle it
   if (request.nextUrl.pathname.startsWith('/auth')) {
-    return authRes;
+    return authRes
   }
 
-  const { origin } = new URL(request.url);
-  const session = await auth0.getSession();
+  const { origin } = new URL(request.url)
+  const session = await auth0.getSession()
 
   // user does not have a session — redirect to login
   if (!session) {
-    return NextResponse.redirect(`${origin}/auth/login`);
+    return NextResponse.redirect(`${origin}/auth/login`)
   }
 
-  return authRes;
+  return authRes
 }
 
 export const config = {
@@ -34,4 +34,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|images|favicon.[ico|png]|sitemap.xml|robots.txt|$).*)',
   ],
-};
+}

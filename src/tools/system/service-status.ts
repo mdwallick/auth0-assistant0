@@ -10,7 +10,7 @@ export const ServiceStatusTool = tool(
             activeServices,
             status: allServices.map(service => ({
                 service,
-                status: activeServices.includes(service) ? 'active' : 'not registered'
+                status: activeServices.includes(service) ? '✅' : '❌'
             }))
         });
     },

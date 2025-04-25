@@ -43,6 +43,11 @@ export function Navbar() {
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-4">
+        <Button variant="outline" onClick={clearChat}>
+          New Chat
+        </Button>
+      </div>
+      <div className="flex items-center gap-4">
         {user && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -71,11 +76,6 @@ export function Navbar() {
                 </PopoverContent>
               </Popover>
             )}
-      </div>
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={clearChat}>
-          New Chat
-        </Button>
       </div>
     </nav>
   )

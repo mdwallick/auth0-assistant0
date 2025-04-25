@@ -3,22 +3,22 @@ import { Auth0Client } from '@auth0/nextjs-auth0/server'
 export type SupportedService = 'microsoft' | 'salesforce' | 'google'
 
 interface ServiceConfig {
-  connection: string;
-  scope?: string;
+  connection: string
+  scope?: string
 }
 
 type Auth0Connection = 'windowslive' | 'google-oauth2' | 'salesforce-dev'
 
 const AUTH0_TO_SERVICE_MAP: Record<Auth0Connection, SupportedService> = {
-  'windowslive': 'microsoft',
+  windowslive: 'microsoft',
   'google-oauth2': 'google',
-  'salesforce-dev': 'salesforce'
+  'salesforce-dev': 'salesforce',
 }
 
 const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   microsoft: { connection: 'windowslive' },
   salesforce: { connection: 'salesforce-dev' },
-  google: { connection: 'google-oauth2' }
+  google: { connection: 'google-oauth2' },
 }
 
 export const auth0 = new Auth0Client({
@@ -36,11 +36,11 @@ export const auth0 = new Auth0Client({
       ...session,
       user: {
         ...session.user,
-        connected_services: decoded_jwt?.connected_services || []
+        connected_services: decoded_jwt?.connected_services || [],
       },
     }
   },
-  
+
   // Handle callback to modify session
   // async onCallback(error, context, session: Auth0Session | null) {
   //   // If there's an error during the callback
@@ -60,7 +60,6 @@ export const auth0 = new Auth0Client({
 
   //   // Add the custom claim to the session's user object
   //   session.user.connected_services = connectedServices.map(cs => AUTH0_TO_SERVICE_MAP[cs.connection])
-
 
   //   // Redirect the user to the provided returnTo URL or default to the home page
   //   return NextResponse.redirect(
@@ -98,11 +97,11 @@ export async function getAccessToken(service: SupportedService): Promise<string>
 
 function decodeJwt(token: string | null) {
   if (token) {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const json = atob(base64);
-    return JSON.parse(json);
+    const payload = token.split('.')[1]
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const json = atob(base64)
+    return JSON.parse(json)
   } else {
-    return null;
+    return null
   }
 }

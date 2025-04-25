@@ -1,33 +1,32 @@
+'use client'
 
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ServiceAuthPanel } from '@/components/ServiceAuthPanel';
+import { useEffect, useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { ServiceAuthPanel } from '@/components/ServiceAuthPanel'
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedUser, setEditedUser] = useState<any>(null)
 
   useEffect(() => {
     // User data is already available through Auth0 session in layout.tsx
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/auth/me');
-        const sessionData = await response.json();
-        setUser(sessionData);
-        setEditedUser(sessionData);
+        const response = await fetch('/api/auth/me')
+        const sessionData = await response.json()
+        setUser(sessionData)
+        setEditedUser(sessionData)
       } catch (error) {
-        console.error('Failed to fetch user:', error);
+        console.error('Failed to fetch user:', error)
       }
-    };
-    fetchUser();
-  }, []);
+    }
+    fetchUser()
+  }, [])
 
   if (!user) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4">Loading...</div>
   }
 
   return (
@@ -40,9 +39,9 @@ export default function ProfilePage() {
               <>
                 <div className="space-y-2">
                   <label className="text-sm">Name</label>
-                  <Input 
+                  <Input
                     value={editedUser.name}
-                    onChange={(e) => setEditedUser({...editedUser, name: e.target.value})}
+                    onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -51,10 +50,15 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={() => setIsEditing(false)}>Save</Button>
-                  <Button variant="outline" onClick={() => {
-                    setIsEditing(false);
-                    setEditedUser(user);
-                  }}>Cancel</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditing(false)
+                      setEditedUser(user)
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </>
             ) : (
@@ -72,11 +76,11 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <ServiceAuthPanel />
         </div>
       </div>
     </div>
-  );
+  )
 }

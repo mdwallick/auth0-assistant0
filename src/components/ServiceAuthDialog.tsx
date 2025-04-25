@@ -1,12 +1,11 @@
-
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { ServiceAuth } from './ServiceAuth';
-import { useState } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { ServiceAuth } from './ServiceAuth'
+import { useState } from 'react'
 
 interface ServiceAuthDialogProps {
-  service: 'microsoft' | 'salesforce' | 'google';
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  service: 'microsoft' | 'salesforce' | 'google'
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function ServiceAuthDialog({ service, isOpen, onOpenChange }: ServiceAuthDialogProps) {
@@ -19,5 +18,5 @@ export function ServiceAuthDialog({ service, isOpen, onOpenChange }: ServiceAuth
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

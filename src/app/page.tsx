@@ -1,11 +1,11 @@
-import { LogIn, UserPlus } from 'lucide-react';
-import { ChatWindow } from '@/components/ChatWindow';
-import { GuideInfoBox } from '@/components/guide/GuideInfoBox';
-import { Button } from '@/components/ui/button';
-import { auth0 } from '@/lib/auth0';
+import { LogIn, UserPlus } from 'lucide-react'
+import { ChatWindow } from '@/components/ChatWindow'
+import { GuideInfoBox } from '@/components/guide/GuideInfoBox'
+import { Button } from '@/components/ui/button'
+import { auth0 } from '@/lib/auth0'
 
 export default async function Home() {
-  const session = await auth0.getSession();
+  const session = await auth0.getSession()
 
   if (!session) {
     return (
@@ -26,14 +26,14 @@ export default async function Home() {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   const InfoCard = (
     <GuideInfoBox>
       <div>Ask me anything!</div>
     </GuideInfoBox>
-  );
+  )
 
   return (
     <ChatWindow
@@ -42,5 +42,5 @@ export default async function Home() {
       placeholder={`Hello ${session?.user?.name}, I'm your personal assistant. How can I help you today?`}
       emptyStateComponent={InfoCard}
     />
-  );
+  )
 }

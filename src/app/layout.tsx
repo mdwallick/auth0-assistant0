@@ -43,21 +43,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </nav>
             </div>
             <div className="flex justify-center">
-              {/* {session && (
-                <>
-                  <Button asChild variant="ghost" size="default" className="text-white">
-                    <a href="/profile" className="flex items-center gap-2">
-                      {session?.user?.name}
-                    </a>
-                  </Button>
-                  <Button asChild variant="destructive" size="default" className="mx-2">
-                    <a href="/auth/logout" className="flex items-center gap-2">
-                      <LogOut />
-                      <span>Logout</span>
-                    </a>
-                  </Button>
-                </>
-              )} */}
             </div>
           </div>
           <Navbar />

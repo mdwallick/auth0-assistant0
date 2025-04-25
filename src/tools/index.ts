@@ -6,8 +6,4 @@
 
 import { SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool } from './salesforce'
 
-export const tools = [
-    SalesforceQueryTool,
-    SalesforceCreateTool,
-    SalesforceSearchTool
-]
+export const tools = [SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool]

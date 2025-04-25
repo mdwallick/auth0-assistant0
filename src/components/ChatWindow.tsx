@@ -1,71 +1,75 @@
-'use client';
+'use client'
 
-import { type Message } from 'ai';
-import { useChat } from '@ai-sdk/react';
-import { useState, useEffect } from 'react';
-import type { FormEvent, ReactNode } from 'react';
-import { toast } from 'sonner';
-import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
-import { ArrowDown, ArrowUpIcon, LoaderCircle } from 'lucide-react';
+import { type Message } from 'ai'
+import { useChat } from '@ai-sdk/react'
+import { useState, useEffect } from 'react'
+import type { FormEvent, ReactNode } from 'react'
+import { toast } from 'sonner'
+import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
+import { ArrowDown, ArrowUpIcon, LoaderCircle } from 'lucide-react'
 
-import { ChatMessageBubble } from '@/components/ChatMessageBubble';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/utils/cn';
+import { ChatMessageBubble } from '@/components/ChatMessageBubble'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/utils/cn'
 
-import { TokenDisplay } from './TokenDisplay';
+import { TokenDisplay } from './TokenDisplay'
 
 function ChatMessages(props: {
-  messages: Message[];
-  emptyStateComponent: ReactNode;
-  aiEmoji?: string;
-  className?: string;
-  isStreaming?: boolean;
+  messages: Message[]
+  emptyStateComponent: ReactNode
+  aiEmoji?: string
+  className?: string
+  isStreaming?: boolean
 }) {
   return (
     <div className="flex flex-col max-w-[1200px] mx-auto pb-12 w-full">
       <div className="w-full">
         <div className="overflow-y-auto">
           {props.messages.map((m, i) => {
-            return <ChatMessageBubble 
-              key={m.id} 
-              message={m} 
-              aiEmoji={props.aiEmoji}
-              isLoading={m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming} 
-            />;
+            return (
+              <ChatMessageBubble
+                key={m.id}
+                message={m}
+                aiEmoji={props.aiEmoji}
+                isLoading={
+                  m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming
+                }
+              />
+            )
           })}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function ScrollToBottom(props: { className?: string }) {
-  const { isAtBottom, scrollToBottom } = useStickToBottomContext();
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext()
 
-  if (isAtBottom) return null;
+  if (isAtBottom) return null
   return (
     <Button variant="outline" className={props.className} onClick={() => scrollToBottom()}>
       <ArrowDown className="w-4 h-4" />
       <span>Scroll to bottom</span>
     </Button>
-  );
+  )
 }
 
 function ChatInput(props: {
-  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  loading?: boolean;
-  placeholder?: string;
-  children?: ReactNode;
-  className?: string;
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  loading?: boolean
+  placeholder?: string
+  children?: ReactNode
+  className?: string
 }) {
   return (
     <form
       onSubmit={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        props.onSubmit(e);
+        e.stopPropagation()
+        e.preventDefault()
+        props.onSubmit(e)
       }}
       className={cn('flex w-full flex-col', props.className)}
     >
@@ -90,16 +94,16 @@ function ChatInput(props: {
         </div>
       </div>
     </form>
-  );
+  )
 }
 
 function StickyToBottomContent(props: {
-  content: ReactNode;
-  footer?: ReactNode;
-  className?: string;
-  contentClassName?: string;
+  content: ReactNode
+  footer?: ReactNode
+  className?: string
+  contentClassName?: string
 }) {
-  const context = useStickToBottomContext();
+  const context = useStickToBottomContext()
 
   // scrollRef will also switch between overflow: unset to overflow: auto
   return (
@@ -114,67 +118,67 @@ function StickyToBottomContent(props: {
 
       {props.footer}
     </div>
-  );
+  )
 }
 
 export function ChatWindow(props: {
-  endpoint: string;
-  emptyStateComponent: ReactNode;
-  placeholder?: string;
-  emoji?: string;
+  endpoint: string
+  emptyStateComponent: ReactNode
+  placeholder?: string
+  emoji?: string
 }) {
-  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [initialMessages, setInitialMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const savedMessages = localStorage.getItem('chatHistory');
+        const savedMessages = localStorage.getItem('chatHistory')
         if (savedMessages) {
-          const parsedMessages = JSON.parse(savedMessages);
-          setInitialMessages(Array.isArray(parsedMessages) ? parsedMessages : []);
+          const parsedMessages = JSON.parse(savedMessages)
+          setInitialMessages(Array.isArray(parsedMessages) ? parsedMessages : [])
         }
       } catch (error) {
-        console.error('Error loading chat history:', error);
-        localStorage.removeItem('chatHistory'); // Clear invalid data
+        console.error('Error loading chat history:', error)
+        localStorage.removeItem('chatHistory') // Clear invalid data
       }
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   const chat = useChat({
     api: props.endpoint,
     initialMessages,
     onFinish(response) {
-      console.log('Final response: ', response?.content);
+      console.log('Final response: ', response?.content)
       if (typeof window !== 'undefined') {
-        localStorage.setItem('chatHistory', JSON.stringify(chat.messages));
+        localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
       }
     },
     onResponse(response) {
-      console.log('Response received. Status:', response.status);
+      console.log('Response received. Status:', response.status)
     },
     onError: (e) => {
-      console.error('Error: ', e);
-      toast.error(`Error while processing your request`, { description: e.message });
+      console.error('Error: ', e)
+      toast.error(`Error while processing your request`, { description: e.message })
     },
-  });
+  })
 
   // Save messages when they change
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('chatHistory', JSON.stringify(chat.messages));
+      localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
     }
-  }, [chat.messages]);
+  }, [chat.messages])
 
   function isChatLoading(): boolean {
-    return chat.isLoading;
+    return chat.isLoading
   }
 
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (isChatLoading()) return;
-    chat.handleSubmit(e);
+    e.preventDefault()
+    if (isChatLoading()) return
+    chat.handleSubmit(e)
   }
 
   return (
@@ -212,5 +216,5 @@ export function ChatWindow(props: {
         }
       ></StickyToBottomContent>
     </StickToBottom>
-  );
+  )
 }
