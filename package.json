@@ -25,6 +25,7 @@
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "ai": "^4.1.44",
+    "auth0": "^4.22.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "googleapis": "^148.0.0",
