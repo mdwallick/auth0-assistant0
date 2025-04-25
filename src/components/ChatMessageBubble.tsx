@@ -30,8 +30,13 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
 
     window.addEventListener('message', messageHandler)
 
+    // Get user ID from current session
+    const userResponse = await fetch('/api/auth/me')
+    const userData = await userResponse.json()
+    const userId = userData?.sub || ''
+
     const popup = window.open(
-      `/auth/login?connection=${service}`,
+      `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
       'Auth0 Login',
       `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
     )

@@ -20,6 +20,7 @@ function ChatMessages(props: {
   aiEmoji?: string
   className?: string
   isStreaming?: boolean
+  onServiceConnect?: (service: string) => void
 }) {
   return (
     <div className="flex flex-col max-w-[1200px] mx-auto pb-12 w-full">
@@ -34,6 +35,7 @@ function ChatMessages(props: {
                 isLoading={
                   m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming
                 }
+                onServiceConnect={props.onServiceConnect}
               />
             )
           })}
@@ -127,33 +129,76 @@ export function ChatWindow(props: {
   placeholder?: string
   emoji?: string
 }) {
-  const [initialMessages, setInitialMessages] = useState<Message[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedMessages = localStorage.getItem('chatHistory')
-        if (savedMessages) {
-          const parsedMessages = JSON.parse(savedMessages)
-          setInitialMessages(Array.isArray(parsedMessages) ? parsedMessages : [])
-        }
-      } catch (error) {
-        console.error('Error loading chat history:', error)
-        localStorage.removeItem('chatHistory') // Clear invalid data
+  const checkServiceStatus = async () => {
+    const response = await fetch('/api/services/status')
+    const data = await response.json()
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `Current service status:\n${data.status.map((s: any) => `${s.service}: ${s.status}`).join('\n')}`
+    }])
+  }
+
+  const handleServiceConnection = async (service: string) => {
+    try {
+      const width = 500
+      const height = 600
+      const left = window.screenX + (window.outerWidth - width) / 2
+      const top = window.screenY + (window.outerHeight - height) / 2
+
+      const userResponse = await fetch('/api/auth/me')
+      const userData = await userResponse.json()
+      const userId = userData?.sub || ''
+
+      const popup = window.open(
+        `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
+        'Auth0 Login',
+        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+      )
+
+      if (!popup) {
+        throw new Error('Please enable popups for this site')
       }
-      setIsLoading(false)
+
+      const result = await new Promise((resolve, reject) => {
+        const messageHandler = (event: MessageEvent) => {
+          if (event.data.type === 'AUTH_COMPLETE') {
+            window.removeEventListener('message', messageHandler)
+            resolve(true)
+          } else if (event.data.type === 'AUTH_ERROR') {
+            window.removeEventListener('message', messageHandler)
+            reject(new Error(event.data.error))
+          }
+        }
+        window.addEventListener('message', messageHandler)
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `Successfully connected to ${service}!`
+      }])
+      await checkServiceStatus()
+    } catch (error) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `Failed to connect to ${service}: ${error.message}`
+      }])
     }
-  }, [])
+  }
 
   const chat = useChat({
     api: props.endpoint,
-    initialMessages,
+    initialMessages: messages,
     onFinish(response) {
       console.log('Final response: ', response?.content)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
-      }
+      localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
     },
     onResponse(response) {
       console.log('Response received. Status:', response.status)
@@ -164,11 +209,8 @@ export function ChatWindow(props: {
     },
   })
 
-  // Save messages when they change
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
-    }
+    localStorage.setItem('chatHistory', JSON.stringify(chat.messages))
   }, [chat.messages])
 
   function isChatLoading(): boolean {
@@ -199,6 +241,7 @@ export function ChatWindow(props: {
               messages={chat.messages}
               emptyStateComponent={props.emptyStateComponent}
               isStreaming={isChatLoading()}
+              onServiceConnect={handleServiceConnection}
             />
           )
         }
