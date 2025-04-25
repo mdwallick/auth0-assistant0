@@ -5,6 +5,8 @@ import { ReplDBSessionStore } from './repl-db-session-store'
 import type { SupportedService } from './services'
 import type { Auth0Connection } from './services'
 
+const sessionStore = new ReplDBSessionStore()
+
 export const auth0 = new Auth0Client({
   secret: process.env.AUTH0_SECRET!,
   domain: process.env.AUTH0_ISSUER_BASE_URL!,
@@ -12,11 +14,31 @@ export const auth0 = new Auth0Client({
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
 
-  session: {
-    store: new ReplDBSessionStore(),
-  },authorizationParameters: {
-    scope: "openid profile email update:current_user_identities",
+  // session: {
+  //   store: new ReplDBSessionStore(),
+  // },
+  
+  sessionStore: {
+    async get(id) {
+      // query and return a session by its ID
+      return await sessionStore.get(id)
+    },
+    async set(id, sessionData) {
+      // upsert the session given its ID and sessionData
+      await sessionStore.set(id, sessionData)
+    },
+    async delete(id) {
+      // delete the session using its ID
+      await sessionStore.delete(id)
+    },
+    // async deleteByLogoutToken({ sid, sub }: { sid: string; sub: string }) {
+    //   // optional method to be implemented when using Back-Channel Logout
+    // },
   },
+
+  // authorizationParameters: {
+  //   scope: "openid profile email update:current_user_identities",
+  // },
 
   async beforeSessionSaved(session, idToken) {
     const decoded_jwt = decodeJwt(idToken)
