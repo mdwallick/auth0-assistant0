@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
 import { ToolInterface } from '@langchain/core/tools';
-
 import { type Message, LangChainAdapter } from 'ai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { ChatOpenAI } from '@langchain/openai';
@@ -9,6 +7,7 @@ import { SystemMessage } from '@langchain/core/messages';
 import { LangChainTracer } from "langchain/callbacks";
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters';
 import { logToolCallsInDevelopment } from '@/utils/stream-logging';
+import { getConnectedServices } from '@/lib/auth0';
 
 // import general tools
 import { Calculator } from '@langchain/community/tools/calculator';
@@ -39,8 +38,6 @@ import {
     SalesforceSearchTool 
 } from '@/tools/salesforce';
 
-import { auth0, getConnectedServices } from '@/lib/auth0';
-
 const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
@@ -67,9 +64,7 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 
 const getAvailableTools = async () => {
     const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool];
-
     const activeServices = await getConnectedServices();
-
 
     if (activeServices.includes('microsoft')) {
         tools.push(
