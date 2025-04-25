@@ -143,4 +143,9 @@
   .chat-message-bubble del {
     text-decoration: line-through;
   }
+  .chat-message-bubble {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    max-width: 600px;
+  }
 }

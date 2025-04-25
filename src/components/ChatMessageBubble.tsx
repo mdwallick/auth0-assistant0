@@ -93,7 +93,7 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     <>
       <div
         className={cn(
-          `rounded-[24px] max-w-[80%] mb-8 flex flex-col`,
+          `rounded-[24px] max-w-fit mb-8 flex flex-col`,
           message.role === 'user' ? 'bg-secondary text-secondary-foreground px-4 py-2' : null,
           message.role === 'user' ? 'ml-auto' : 'mr-auto',
         )}
