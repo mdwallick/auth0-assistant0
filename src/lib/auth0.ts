@@ -8,7 +8,9 @@ interface ServiceConfig {
   scope?: string;
 }
 
-const AUTH0_TO_SERVICE_MAP: Record<string, SupportedService> = {
+type Auth0Connection = 'windowslive' | 'google-oauth2' | 'salesforce-dev';
+
+const AUTH0_TO_SERVICE_MAP: Record<Auth0Connection, SupportedService> = {
   'windowslive': 'microsoft',
   'google-oauth2': 'google',
   'salesforce-dev': 'salesforce'
@@ -20,7 +22,7 @@ const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   google: { connection: 'google-oauth2' }
 };
 
-function mapAuth0ConnectionToService(connection: string): SupportedService | undefined {
+function mapAuth0ConnectionToService(connection: Auth0Connection): SupportedService {
   return AUTH0_TO_SERVICE_MAP[connection];
 }
 
