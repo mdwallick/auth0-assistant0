@@ -68,13 +68,8 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 const getAvailableTools = async () => {
     const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool];
 
-    const connectedServices = await getConnectedServices();
-    const activeServices = connectedServices.map(connection => {
-        if (connection === 'windowslive') return 'microsoft';
-        if (connection === 'google-oauth2') return 'google';
-        if (connection === 'salesforce-dev') return 'salesforce';
-        return undefined;
-    }).filter((service): service is SupportedService => service !== undefined);
+    const activeServices = await getConnectedServices();
+
 
     if (activeServices.includes('microsoft')) {
         tools.push(
