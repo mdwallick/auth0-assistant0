@@ -4,4 +4,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 module.exports = withBundleAnalyzer({
   serverExternalPackages: ['pdf-parse'],
+  images: {
+    domains: ['s.gravatar.com', 'cdn.auth0.com'],
+  },
 });
