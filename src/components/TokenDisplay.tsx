@@ -26,7 +26,7 @@ export function TokenDisplay() {
             const decoded = JSON.parse(atob(payload));
             console.log('Decoded token:', decoded);
             setIdToken(decoded);
-          } catch (err) {
+          } catch (err: any) {
             console.error('Error decoding token:', err);
             setError(`Error decoding token: ${err.message}`);
           }
