@@ -41,11 +41,20 @@ export function TokenDisplay() {
   }
 
   return (
+    <>
     <div className="bg-black/10 p-4 rounded-lg w-full h-full overflow-hidden">
       <h3 className="font-mono text-sm mb-2">Session Data:</h3>
       <pre className="text-xs overflow-auto h-[calc(100%-2rem)]">
         {JSON.stringify(session, null, 2)}
       </pre>
     </div>
-  );
+
+  <div className="bg-black/10 p-4 rounded-lg w-full h-full overflow-hidden">
+    <h3 className="font-mono text-sm mb-2">Session Data:</h3>
+    <pre className="text-xs overflow-auto h-[calc(100%-2rem)]">
+      {JSON.stringify(session.id_token, null, 2)}
+    </pre>
+  </div>
+      </>
+);
 }
