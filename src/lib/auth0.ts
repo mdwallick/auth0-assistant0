@@ -1,5 +1,6 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
 import { SERVICE_CONFIGS, AUTH0_TO_SERVICE_MAP } from './services'
+import { ReplDBSessionStore } from './repl-db-session-store'
 
 import type { SupportedService } from './services'
 import type { Auth0Connection } from './services'
@@ -11,20 +12,8 @@ export const auth0 = new Auth0Client({
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
 
-  sessionStore: {
-    async get(id) {
-      // query and return a session by its ID
-    },
-    async set(id, sessionData) {
-      // upsert the session given its ID and sessionData
-    },
-    async delete(id) {
-      // delete the session using its ID
-    },
-    async deleteByLogoutToken({ sid, sub }: { sid: string; sub: string }) {
-      // optional method to be implemented when using Back-Channel Logout
-    },
-    
+  session: {
+    store: new ReplDBSessionStore(),
   },authorizationParameters: {
     scope: "openid profile email update:current_user_identities",
   },

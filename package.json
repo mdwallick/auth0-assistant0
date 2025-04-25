@@ -24,6 +24,7 @@
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.2",
+    "@replit/database": "^3.0.1",
     "ai": "^4.1.44",
     "auth0": "^4.22.0",
     "class-variance-authority": "^0.7.1",
