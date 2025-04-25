@@ -1,24 +1,10 @@
-import { NextResponse } from 'next/server'
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
-import type { SessionData } from '@auth0/nextjs-auth0/types'
 
 export type SupportedService = 'microsoft' | 'salesforce' | 'google'
 
 interface ServiceConfig {
   connection: string;
   scope?: string;
-}
-
-interface IdTokenClaims {
-  connected_services?: { connection: Auth0Connection }[]
-}
-
-interface Auth0Session extends SessionData {
-  user: {
-    connected_services: SupportedService[]
-  }
-  idTokenClaims: IdTokenClaims
-  // other session properties...
 }
 
 type Auth0Connection = 'windowslive' | 'google-oauth2' | 'salesforce-dev'
@@ -43,32 +29,44 @@ export const auth0 = new Auth0Client({
   clientId: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
 
-  // Handle callback to modify session
-  async onCallback(error, context, session: Auth0Session | null) {
-    // If there's an error during the callback
-    if (error) {
-      return NextResponse.redirect(
-        new URL(`/error?error=${error.message}`, process.env.APP_BASE_URL)
-      );
+  async beforeSessionSaved(session, idToken) {
+    const decoded_jwt = decodeJwt(idToken)
+    console.log(decoded_jwt)
+    return {
+      ...session,
+      user: {
+        ...session.user,
+        connected_services: decoded_jwt?.connected_services || []
+      },
     }
-
-    // Handle the case where the session could be null
-    if (!session) {
-      throw new Error('Session cannot be null');
-    }
-
-    // Accessing the custom claim from the ID token (session.idTokenClaims)
-    const connectedServices = session.idTokenClaims?.connected_services || []
-
-    // Add the custom claim to the session's user object
-    session.user.connected_services = connectedServices.map(cs => AUTH0_TO_SERVICE_MAP[cs.connection])
-
-
-    // Redirect the user to the provided returnTo URL or default to the home page
-    return NextResponse.redirect(
-      new URL(context.returnTo || '/', process.env.APP_BASE_URL)
-    )
   },
+  
+  // Handle callback to modify session
+  // async onCallback(error, context, session: Auth0Session | null) {
+  //   // If there's an error during the callback
+  //   if (error) {
+  //     return NextResponse.redirect(
+  //       new URL(`/error?error=${error.message}`, process.env.APP_BASE_URL)
+  //     );
+  //   }
+
+  //   // Handle the case where the session could be null
+  //   if (!session) {
+  //     throw new Error('Session cannot be null');
+  //   }
+
+  //   // Accessing the custom claim from the ID token (session.idTokenClaims)
+  //   const connectedServices = session.idTokenClaims?.connected_services || []
+
+  //   // Add the custom claim to the session's user object
+  //   session.user.connected_services = connectedServices.map(cs => AUTH0_TO_SERVICE_MAP[cs.connection])
+
+
+  //   // Redirect the user to the provided returnTo URL or default to the home page
+  //   return NextResponse.redirect(
+  //     new URL(context.returnTo || '/', process.env.APP_BASE_URL)
+  //   )
+  // },
 })
 
 export async function getConnectedServices(): Promise<SupportedService[]> {
@@ -96,4 +94,15 @@ export async function getAccessToken(service: SupportedService): Promise<string>
   })
 
   return token
+}
+
+function decodeJwt(token: string | null) {
+  if (token) {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } else {
+    return null;
+  }
 }
