@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ToolInterface } from '@langchain/core/tools';
@@ -14,7 +13,6 @@ import { logToolCallsInDevelopment } from '@/utils/stream-logging';
 // import general tools
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
-import { serviceRegistry } from '@/lib/service-registry';
 import { ServiceStatusTool } from '@/tools/system/service-status';
 
 // import Google tools
