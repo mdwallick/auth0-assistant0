@@ -4,19 +4,28 @@ import { SERVICE_CONFIGS, AUTH0_TO_SERVICE_MAP } from './services'
 import type { SupportedService } from './services'
 import type { Auth0Connection } from './services'
 
-import { CustomSessionStore } from './custom-session-store';
-
 export const auth0 = new Auth0Client({
   secret: process.env.AUTH0_SECRET!,
   domain: process.env.AUTH0_ISSUER_BASE_URL!,
   appBaseUrl: process.env.APP_BASE_URL!,
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
-  session: {
-    store: new CustomSessionStore(),
-  },
 
-  authorizationParameters: {
+  sessionStore: {
+    async get(id) {
+      // query and return a session by its ID
+    },
+    async set(id, sessionData) {
+      // upsert the session given its ID and sessionData
+    },
+    async delete(id) {
+      // delete the session using its ID
+    },
+    async deleteByLogoutToken({ sid, sub }: { sid: string; sub: string }) {
+      // optional method to be implemented when using Back-Channel Logout
+    },
+    
+  },authorizationParameters: {
     scope: "openid profile email update:current_user_identities",
   },
 
