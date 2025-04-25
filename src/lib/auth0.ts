@@ -23,11 +23,11 @@ export const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
 
 export const auth0 = new Auth0Client({
   // Required settings
-  secret: process.env.AUTH0_SECRET,
-  domain: process.env.AUTH0_ISSUER_BASE_URL,
-  appBaseUrl: process.env.APP_BASE_URL,
-  clientId: process.env.AUTH0_CLIENT_ID,
-  clientSecret: process.env.AUTH0_CLIENT_SECRET,
+  secret: process.env.AUTH0_SECRET!,
+  domain: process.env.AUTH0_ISSUER_BASE_URL!,
+  appBaseUrl: process.env.APP_BASE_URL!,
+  clientId: process.env.AUTH0_CLIENT_ID!,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET!,
 
   authorizationParameters: {
     scope: "openid profile email update:current_user_identities",

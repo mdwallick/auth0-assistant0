@@ -14,10 +14,16 @@ export async function middleware(request: NextRequest) {
   }
 
   const { origin } = new URL(request.url)
-  const session = await auth0.getSession()
-
-  // user does not have a session — redirect to login
-  if (!session) {
+  try {
+    const session = await auth0.getSession()
+    
+    // user does not have a session — redirect to login
+    if (!session) {
+      console.log('No session found, redirecting to login')
+      return NextResponse.redirect(`${origin}/auth/login`)
+    }
+  } catch (error) {
+    console.error('Auth0 session error:', error)
     return NextResponse.redirect(`${origin}/auth/login`)
   }
 
