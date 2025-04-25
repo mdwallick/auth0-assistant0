@@ -19,8 +19,12 @@ export function TokenDisplay() {
         console.log('User data:', user); // Debug log
         if (user.id_token) {
           try {
-            const decoded = JSON.parse(atob(user.id_token.split('.')[1]));
-            console.log('Decoded token:', decoded); // Debug log
+            if (!user.id_token) {
+              throw new Error('No ID token available');
+            }
+            const [header, payload, signature] = user.id_token.split('.');
+            const decoded = JSON.parse(atob(payload));
+            console.log('Decoded token:', decoded);
             setIdToken(decoded);
           } catch (err) {
             console.error('Error decoding token:', err);

@@ -9,6 +9,6 @@ export async function GET() {
   }
   return NextResponse.json({
     ...session.user,
-    id_token: session.idToken
+    id_token: session.idToken || session.id_token
   });
 }
