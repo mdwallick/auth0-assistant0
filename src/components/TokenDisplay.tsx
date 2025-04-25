@@ -64,7 +64,7 @@ export function TokenDisplay() {
   }
 
   return (
-    <div className="bg-black/10 p-4 rounded-lg max-w-[768px] mx-auto mb-4">
+    <div className="bg-black/10 p-4 rounded-lg w-full mb-4">
       <h3 className="font-mono text-sm mb-2">ID Token Claims:</h3>
       <pre className="text-xs overflow-auto">
         {JSON.stringify(idToken, null, 2)}

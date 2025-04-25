@@ -23,7 +23,7 @@ function ChatMessages(props: {
 }) {
   return (
     <div className="flex flex-col max-w-[1200px] mx-auto pb-12 w-full">
-      <div className="grid grid-cols-[1fr,320px] gap-4">
+      <div className="grid grid-cols-[1fr,400px] gap-4">
         <div>
           {props.messages.map((m, i) => {
         return <ChatMessageBubble 
