@@ -18,11 +18,17 @@ export function TokenDisplay() {
       .then(user => {
         console.log('User data:', user); // Debug log
         if (user.id_token) {
-          const decoded = JSON.parse(atob(user.id_token.split('.')[1]));
-          console.log('Decoded token:', decoded); // Debug log
-          setIdToken(decoded);
+          try {
+            const decoded = JSON.parse(atob(user.id_token.split('.')[1]));
+            console.log('Decoded token:', decoded); // Debug log
+            setIdToken(decoded);
+          } catch (err) {
+            console.error('Error decoding token:', err);
+            setError(`Error decoding token: ${err.message}`);
+          }
         } else {
-          setError('No ID token found');
+          console.log('No id_token in user data:', Object.keys(user));
+          setError(`No ID token found. Available user data: ${Object.keys(user).join(', ')}`);
         }
       })
       .catch(err => {
