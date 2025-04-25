@@ -22,7 +22,13 @@ export function TokenDisplay() {
             if (!user.id_token) {
               throw new Error('No ID token available');
             }
-            const [header, payload, signature] = user.id_token.split('.');
+            // Make sure we have a valid JWT format
+            const parts = user.id_token.split('.');
+            if (parts.length !== 3) {
+              throw new Error('Invalid JWT format');
+            }
+            // Base64Url decode the payload
+            const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
             const decoded = JSON.parse(atob(payload));
             console.log('Decoded token:', decoded);
             setIdToken(decoded);

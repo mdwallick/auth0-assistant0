@@ -10,6 +10,6 @@ export async function GET() {
   }
   return NextResponse.json({
     ...session.user,
-    id_token: session.tokenSet.idToken
+    id_token: session.tokenSet?.idToken || null
   });
 }
