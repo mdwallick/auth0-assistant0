@@ -6,7 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { ServiceAuthPanel } from './ServiceAuthPanel';
-import { Button } from '@/components/ui/button'; // Added import
+import { Button, Popover, PopoverTrigger, PopoverContent } from '@/components/ui/button'; // Added Popover imports
+
 
 export const ActiveLink = (props: { href: string; children: ReactNode }) => {
   const pathname = usePathname();
@@ -25,7 +26,7 @@ export const ActiveLink = (props: { href: string; children: ReactNode }) => {
 
 export function Navbar() {
   const [user, setUser] = useState(null);
-  
+
   useEffect(() => {
     fetch('/api/auth/me')
       .then(res => res.json())
@@ -44,21 +45,33 @@ export function Navbar() {
     <nav className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-4">
         {user && (
-          <div className="flex items-center gap-2">
-            {user.picture && (
-              <Image 
-                src={user.picture} 
-                alt="Profile" 
-                width={32} 
-                height={32} 
-                className="rounded-full"
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    {user.picture && (
+                      <Image 
+                        src={user.picture} 
+                        alt="Profile" 
+                        width={32} 
+                        height={32} 
+                        className="rounded-full"
+                      />
+                    )}
+                    <span>{user.name}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48">
+                  <div className="flex flex-col space-y-1">
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link href="/profile">Profile</Link>
+                    </Button>
+                    <Button variant="ghost" asChild className="justify-start text-red-500 hover:text-red-600 hover:bg-red-50">
+                      <Link href="/auth/logout">Logout</Link>
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
-            <a href="/profile" className="flex items-center gap-2">
-              <span>{user.name}</span>
-            </a>
-          </div>
-        )}
       </div>
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={clearChat}>
