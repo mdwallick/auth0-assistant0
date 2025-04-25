@@ -4,13 +4,17 @@ import { auth0 } from '@/lib/auth0';
 
 export async function GET() {
   const session = await auth0.getSession();
-  //console.log('Full Session:', session);
+  
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
-  return NextResponse.json({
-    ...session.user,
-    connected_services: session.user['connected_services'] || [],
-    id_token: session.tokenSet?.idToken || null
-  });
+
+  const response = {
+      ...session.user,
+      connected_services: session.user['connected_services'] || [],
+      id_token: session.tokenSet?.idToken || null
+  }
+
+  console.log('Full Session:', response);
+  return NextResponse.json(response);
 }

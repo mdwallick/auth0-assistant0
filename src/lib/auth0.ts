@@ -16,11 +16,11 @@ const AUTH0_TO_SERVICE_MAP: Record<Auth0Connection, SupportedService> = {
   'salesforce-dev': 'salesforce'
 };
 
-const SERVICE_TO_AUTH0_MAP: Record<SupportedService, Auth0Connection> = {
-  'microsoft': 'windowslive',
-  'google': 'google-oauth2',
-  'salesforce': 'salesforce-dev'
-};
+// const SERVICE_TO_AUTH0_MAP: Record<SupportedService, Auth0Connection> = {
+//   'microsoft': 'windowslive',
+//   'google': 'google-oauth2',
+//   'salesforce': 'salesforce-dev'
+// };
 
 const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   microsoft: { connection: 'windowslive' },
@@ -28,9 +28,9 @@ const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   google: { connection: 'google-oauth2' }
 };
 
-function mapAuth0ConnectionToService(connection: Auth0Connection): SupportedService {
-  return AUTH0_TO_SERVICE_MAP[connection];
-}
+// function mapAuth0ConnectionToService(connection: Auth0Connection): SupportedService {
+//   return AUTH0_TO_SERVICE_MAP[connection];
+// }
 
 export const auth0 = new Auth0Client();
 
