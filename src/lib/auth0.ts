@@ -32,8 +32,6 @@ export async function getConnectedServices(): Promise<SupportedService[]> {
   const session = await auth0.getSession();
   const auth0Services = session?.user?.connected_services || [];
   return auth0Services
-    //.map(connection => mapAuth0ConnectionToService(connection))
-    //.filter((service): service is SupportedService => service !== undefined);
     .map((connection: Auth0Connection) => mapAuth0ConnectionToService(connection))
     .filter((service: SupportedService | undefined): service is SupportedService => service !== undefined);
 }
