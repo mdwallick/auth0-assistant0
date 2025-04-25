@@ -1,12 +1,26 @@
+
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import type { SupportedService } from '@/lib/auth0'
 
 interface ServiceAuthProps {
   service: SupportedService
-  isActive: boolean
 }
 
-export function ServiceAuth({ service, isActive }: ServiceAuthProps) {
+export function ServiceAuth({ service }: ServiceAuthProps) {
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        const connectedServices = data.connected_services || []
+        setIsActive(connectedServices.some(cs => cs.provider === service))
+      })
+      .catch(console.error)
+  }, [service])
 
   return (
     <div className="flex items-center gap-2 p-2">
