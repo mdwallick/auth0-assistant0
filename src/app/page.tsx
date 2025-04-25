@@ -13,13 +13,13 @@ export default async function Home() {
         <h2 className="text-xl">You are not logged in</h2>
         <div className="flex gap-4">
           <Button asChild variant="default" size="default">
-            <a href="/api/auth/login" className="flex items-center gap-2">
+            <a href="/auth/login" className="flex items-center gap-2">
               <LogIn />
               <span>Login</span>
             </a>
           </Button>
           <Button asChild variant="default" size="default">
-            <a href="/api/auth/login?screen_hint=signup">
+            <a href="/auth/login?screen_hint=signup">
               <UserPlus />
               <span>Sign up</span>
             </a>
