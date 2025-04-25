@@ -56,7 +56,7 @@ export const auth0 = new Auth0Client({
     if (!session) {
       throw new Error('Session cannot be null');
     }
-    
+
     // Accessing the custom claim from the ID token (session.idTokenClaims)
     const connectedServices = session.idTokenClaims?.connected_services || []
 
