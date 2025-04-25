@@ -8,17 +8,30 @@ interface ServiceConfig {
   scope?: string;
 }
 
+const AUTH0_TO_SERVICE_MAP: Record<string, SupportedService> = {
+  'windowslive': 'microsoft',
+  'google-oauth2': 'google',
+  'salesforce-dev': 'salesforce'
+};
+
 const SERVICE_CONFIGS: Record<SupportedService, ServiceConfig> = {
   microsoft: { connection: 'windowslive' },
   salesforce: { connection: 'salesforce-dev' },
   google: { connection: 'google-oauth2' }
 };
 
+function mapAuth0ConnectionToService(connection: string): SupportedService | undefined {
+  return AUTH0_TO_SERVICE_MAP[connection];
+}
+
 export const auth0 = new Auth0Client();
 
 export async function getConnectedServices(): Promise<SupportedService[]> {
   const session = await auth0.getSession();
-  return session?.user?.connected_services || [];
+  const auth0Services = session?.user?.connected_services || [];
+  return auth0Services
+    .map(connection => mapAuth0ConnectionToService(connection))
+    .filter((service): service is SupportedService => service !== undefined);
 }
 
 export async function getAccessToken(service: SupportedService): Promise<string> {
