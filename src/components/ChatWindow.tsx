@@ -22,9 +22,10 @@ function ChatMessages(props: {
   isStreaming?: boolean;
 }) {
   return (
-    <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
-      <TokenDisplay />
-      {props.messages.map((m, i) => {
+    <div className="flex flex-col max-w-[1200px] mx-auto pb-12 w-full">
+      <div className="grid grid-cols-[1fr,320px] gap-4">
+        <div>
+          {props.messages.map((m, i) => {
         return <ChatMessageBubble 
             key={m.id} 
             message={m} 
@@ -32,6 +33,11 @@ function ChatMessages(props: {
             isLoading={m.role === 'assistant' && props.messages.indexOf(m) === props.messages.length - 1 && props.isStreaming} 
           />;
       })}
+        </div>
+        <div className="sticky top-4">
+          <TokenDisplay />
+        </div>
+      </div>
     </div>
   );
 }
