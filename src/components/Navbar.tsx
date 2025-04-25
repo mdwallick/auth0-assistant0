@@ -5,7 +5,8 @@ import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
-import { Button, Popover, PopoverTrigger, PopoverContent } from '@/components/ui/button'; // Added Popover imports
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 export const ActiveLink = (props: { href: string; children: ReactNode }) => {
   const pathname = usePathname();
