@@ -10,16 +10,8 @@ interface ServiceAuthProps {
 }
 
 export function ServiceAuth({ service }: ServiceAuthProps) {
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(user => {
-        setIsActive(user.connected_services?.includes(service) || false);
-      })
-      .catch(console.error);
-  }, [service]);
+  const connectedServices = useConnectedServices();
+  const isActive = connectedServices.includes(service);
 
   const handleAuth = async () => {
     const width = 500;

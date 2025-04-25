@@ -3,16 +3,7 @@ import { useState, useEffect } from 'react'
 import { ServiceAuth } from './ServiceAuth'
 
 export function ServiceAuthPanel() {
-  const [activeServices, setActiveServices] = useState<string[]>([])
-
-  useEffect(() => {
-    const checkServices = async () => {
-      const response = await fetch('/api/services/status')
-      const data = await response.json()
-      setActiveServices(data.activeServices)
-    }
-    checkServices()
-  }, [])
+  const activeServices = useConnectedServices();
 
   return (
     <div className="p-4 space-y-2 border rounded-lg">
