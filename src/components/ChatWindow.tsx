@@ -12,6 +12,8 @@ import { ChatMessageBubble } from '@/components/ChatMessageBubble';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 
+import { TokenDisplay } from './TokenDisplay';
+
 function ChatMessages(props: {
   messages: Message[];
   emptyStateComponent: ReactNode;
@@ -21,6 +23,7 @@ function ChatMessages(props: {
 }) {
   return (
     <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
+      <TokenDisplay />
       {props.messages.map((m, i) => {
         return <ChatMessageBubble 
             key={m.id} 
