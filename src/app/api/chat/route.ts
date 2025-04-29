@@ -15,7 +15,6 @@ import { getConnectedServices } from '@/lib/auth0'
 import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
-import { getAccessToken } from '@/lib/auth0';
 import {
   GoogleMailReadTool,
   GoogleMailWriteTool,
@@ -41,7 +40,7 @@ const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
 
-Before using any service-specific tools (Microsoft, Salesforce, Google), check if the service is active using the ServiceStatusTool with skipStatusCheck set to true.
+Before using any service-specific tools (Microsoft, Salesforce, Google), check if the service is active using the ServiceStatusTool.
 If a requested service is not active, inform the user they need to authenticate with that service first.
 
 Current time information:
@@ -56,6 +55,8 @@ IMPORTANT: When using tools that create or modify data (like calendar events, fi
 
 Use Microsoft calendar tools to check or create events in the user's Microsoft calendar.
 Use Microsoft file tools to examine files in the user's OneDrive.
+Use Google calendar tools to check or create events in the user's Google calendar.
+Use Google mail tools to read or send emails in the user's Google mailbox.
 Use Salesforce tools to query or create records in Salesforce.
 
 Render the email body as a markdown block. Do not wrap it in code blocks.
@@ -90,13 +91,10 @@ const getAvailableTools = async (intent?: string) => {
   }
 
   if (activeServices.includes('google')) {
-    const getGoogleCreds = async () => ({
-      accessToken: await getAccessToken('google')
-    })
 
     const googleTools = {
-      mail: [new GoogleMailReadTool(), new GoogleMailWriteTool()],
-      calendar: [new GoogleCalendarReadTool(), new GoogleCalendarWriteTool()]
+      mail: [GoogleMailReadTool, GoogleMailWriteTool],
+      calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool]
     }
 
     if (intent === 'mail') {
