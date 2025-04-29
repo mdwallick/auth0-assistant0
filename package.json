@@ -29,6 +29,7 @@
     "auth0": "^4.22.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "docx": "^9.4.1",
     "googleapis": "^148.0.0",
     "isomorphic-fetch": "^3.0.0",
     "jsforce": "^3.8.0",

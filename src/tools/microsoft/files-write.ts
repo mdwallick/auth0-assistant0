@@ -1,8 +1,9 @@
-
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
 import { getMicrosoftAccessToken } from './auth'
+
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 const toolSchema = z.object({
   path: z.string().describe('Full path to the file in OneDrive (e.g. /Documents/example.docx)'),
@@ -39,26 +40,27 @@ export const MicrosoftFilesWriteTool = tool(
       }
 
       if (type === 'docx') {
-        // Create a Word document using Office Open XML format
-        const wordContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<?mso-application progid="Word.Document"?>
-<w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml">
-  <w:body>
-    ${content.split('\n').map(line => 
-      `<w:p><w:r><w:t>${line.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]))}</w:t></w:r></w:p>`
-    ).join('\n')}
-  </w:body>
-</w:wordDocument>`
+        const doc = new Document({
+          sections: [
+            {
+              children: content.split('\n').map(
+                line => new Paragraph({ children: [new TextRun(line)] })
+              ),
+            },
+          ],
+        });
+
+        const buffer = await Packer.toBuffer(doc);
 
         const newFile = await client.api(`/me/drive/root:${path}:/content`)
-          .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-          .put(wordContent)
+          .header('Content-Type', templateType)
+          .put(buffer);
 
         return JSON.stringify({
           status: 'success',
           message: `Word document at ${path} was successfully created/updated`,
           fileId: newFile.id
-        })
+        });
       } else if (type === 'xlsx') {
         // For Excel files, create a proper XLSX workbook
         const XLSX = require('xlsx');
