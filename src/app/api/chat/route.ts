@@ -19,7 +19,10 @@ import {
   GoogleMailReadTool,
   GoogleMailWriteTool,
   GoogleCalendarReadTool,
-  GoogleCalendarWriteTool
+  GoogleCalendarWriteTool,
+  GoogleDriveListTool,
+  GoogleDriveReadTool,
+  GoogleDriveWriteTool
 } from '@/tools/google'
 
 // import Microsoft tools
@@ -94,15 +97,18 @@ const getAvailableTools = async (intent?: string) => {
 
     const googleTools = {
       mail: [GoogleMailReadTool, GoogleMailWriteTool],
-      calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool]
-    }
+      calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool],
+      files: [GoogleDriveListTool, GoogleDriveReadTool, GoogleDriveWriteTool]
+    };
 
     if (intent === 'mail') {
       tools.push(...googleTools.mail)
     } else if (intent === 'calendar') {
       tools.push(...googleTools.calendar)
+    } else if (intent === 'files') {
+      tools.push(...googleTools.files)
     } else {
-      tools.push(...[...googleTools.mail, ...googleTools.calendar])
+      tools.push(...Object.values(googleTools).flat())
     }
   }
 
