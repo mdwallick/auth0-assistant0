@@ -39,7 +39,7 @@ export const MicrosoftFilesWriteTool = tool(
       }
 
       // Create document with content in a single operation
-      await client.api(`/me/drive/root:${path}:/content`)
+      const newFile = await client.api(`/me/drive/root:${path}:/content`)
         .header('Content-Type', templateType)
         .put(content)
 
