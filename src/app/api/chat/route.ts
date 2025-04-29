@@ -15,10 +15,10 @@ import { getConnectedServices } from '@/lib/auth0'
 import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
-// import { getGoogleAccessToken } from '@/lib/auth0';
-// import { GmailSearch } from '@langchain/community/tools/gmail';
-// import { GmailCreateDraft } from '@langchain/community/tools/gmail';
-// import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
+import { getGoogleAccessToken } from '@/lib/auth0';
+import { GmailSearch } from '@langchain/community/tools/gmail';
+import { GmailCreateDraft } from '@langchain/community/tools/gmail';
+import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
 
 // import Microsoft tools
 import {
