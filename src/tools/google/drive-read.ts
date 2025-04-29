@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   path: z.string().describe('Full path to the file in Google Drive'),
@@ -11,8 +11,8 @@ const toolSchema = z.object({
 export const GoogleDriveReadTool = tool(
   async ({ path }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const drive = google.drive({ version: 'v3', auth: { credentials: { access_token: token } } })
+      const auth = await getGoogleClient()
+      const drive = google.drive({ version: 'v3', auth })
 
       const fileName = path.split('/').pop()
       const res = await drive.files.list({

@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   summary: z.string().describe('Title of the event'),
@@ -15,8 +15,8 @@ const toolSchema = z.object({
 export const GoogleCalendarWriteTool = tool(
   async ({ summary, description, start, end, attendees }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const calendar = google.calendar({ version: 'v3', auth: { credentials: { access_token: token } } })
+      const auth = await getGoogleClient()
+      const calendar = google.calendar({ version: 'v3', auth })
 
       const event = {
         summary,

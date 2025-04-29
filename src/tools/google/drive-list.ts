@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   path: z.string().optional().nullable().describe('Path to the folder. Leave blank for root.'),
@@ -11,8 +11,8 @@ const toolSchema = z.object({
 export const GoogleDriveListTool = tool(
   async ({ path = '' }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const drive = google.drive({ version: 'v3', auth: { credentials: { access_token: token } } })
+      const auth = await getGoogleClient()
+      const drive = google.drive({ version: 'v3', auth })
 
       let query = "'root' in parents"
       if (path) {

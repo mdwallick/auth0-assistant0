@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   to: z.array(z.string()).describe('Array of recipient email addresses'),
@@ -14,8 +14,8 @@ const toolSchema = z.object({
 export const GoogleMailWriteTool = tool(
   async ({ to, subject, body, cc }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const gmail = google.gmail({ version: 'v1', auth: { credentials: { access_token: token } } })
+      const auth = await getGoogleClient()
+      const gmail = google.gmail({ version: 'v1', auth })
 
       const message = [
         'Content-Type: text/html; charset=utf-8',

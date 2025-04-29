@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   query: z.string().optional().nullable().describe('Search query for email subject or body'),

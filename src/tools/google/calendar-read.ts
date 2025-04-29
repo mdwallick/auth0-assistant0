@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { google } from 'googleapis'
-import { getGoogleAccessToken } from './auth'
+import { getGoogleClient } from './auth'
 
 const toolSchema = z.object({
   timeMin: z.string().datetime().describe('Start time in ISO 8601 format'),
@@ -13,8 +13,8 @@ const toolSchema = z.object({
 export const GoogleCalendarReadTool = tool(
   async ({ timeMin, timeMax, maxResults = 10 }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const calendar = google.calendar({ version: 'v3', auth: { credentials: { access_token: token } } })
+      const auth = await getGoogleClient()
+      const calendar = google.calendar({ version: 'v3', auth })
 
       const response = await calendar.events.list({
         calendarId: 'primary',
