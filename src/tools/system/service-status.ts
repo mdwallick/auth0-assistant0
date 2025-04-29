@@ -4,16 +4,17 @@ import { auth0, type SupportedService } from '@/lib/auth0'
 import { z } from 'zod'
 
 const inputSchema = z.object({
-  input: z.string().optional().nullable()
+  input: z.string().nullish(),
+  skipStatusCheck: z.boolean().optional().default(false)
 })
 
 export const ServiceStatusTool = tool(
-    async (_, runManager) => {
-        // Skip status check if we're already in a status check (prevent recursion)
-        if (runManager?.tags?.includes('status-check')) {
+    async ({ skipStatusCheck = false }) => {
+        // Skip status check if flag is set
+        if (skipStatusCheck) {
             return JSON.stringify({
-                status: 'error',
-                message: 'Status check already in progress'
+                status: 'skipped',
+                message: 'Status check skipped to prevent recursion'
             });
         }
 
@@ -47,7 +48,6 @@ export const ServiceStatusTool = tool(
     {
         name: 'ServiceStatusTool',
         description: 'Check which services are currently registered and active',
-        schema: inputSchema,
-        tags: ['status-check']
+        schema: inputSchema
     }
 )
