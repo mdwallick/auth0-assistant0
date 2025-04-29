@@ -16,8 +16,6 @@ import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
 import { getAccessToken } from '@/lib/auth0';
-import { GmailSearch, GmailCreateDraft } from '@langchain/community/tools/gmail';
-import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
 
 // import Microsoft tools
 import {
@@ -88,22 +86,19 @@ const getAvailableTools = async (intent?: string) => {
   if (activeServices.includes('google')) {
     const getGoogleCreds = async () => ({
       accessToken: await getAccessToken('google')
-    });
+    })
 
     const googleTools = [
-      new GmailSearch({ credentials: getGoogleCreds }),
-      new GmailCreateDraft({ credentials: getGoogleCreds }),
-      new GoogleCalendarCreateTool({ credentials: getGoogleCreds }),
-      new GoogleCalendarViewTool({ credentials: getGoogleCreds })
-    ];
+      
+    ]
 
-    if (intent === 'mail') {
-      tools.push(googleTools[0], googleTools[1]);
-    } else if (intent === 'calendar') {
-      tools.push(googleTools[2], googleTools[3]);
-    } else {
-      tools.push(...googleTools);
-    }
+    // if (intent === 'mail') {
+    //   tools.push(googleTools[0], googleTools[1])
+    // } else if (intent === 'calendar') {
+    //   tools.push(googleTools[2], googleTools[3])
+    // } else {
+    //   tools.push(...googleTools)
+    // }
   }
 
   return tools
