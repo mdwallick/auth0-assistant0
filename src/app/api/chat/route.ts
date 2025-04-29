@@ -10,8 +10,8 @@ import { logToolCallsInDevelopment } from '@/utils/stream-logging'
 import { getConnectedServices } from '@/lib/auth0'
 
 // import general tools
-import { Calculator } from '@langchain/community/tools/calculator'
-import { SerpAPI } from '@langchain/community/tools/serpapi'
+// import { Calculator } from '@langchain/community/tools/calculator'
+// import { SerpAPI } from '@langchain/community/tools/serpapi'
 import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
