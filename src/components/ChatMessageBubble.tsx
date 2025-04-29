@@ -33,7 +33,8 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
     // Get user ID from current session
     const userResponse = await fetch('/api/auth/me')
     const userData = await userResponse.json()
-    const userId = userData?.sub || ''
+    const extUserId = userData?.sub || ''
+    const userId = encodeURIComponent(extUserId.replace('|', ':'))
 
     const popup = window.open(
       `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,

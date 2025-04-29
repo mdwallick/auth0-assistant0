@@ -152,7 +152,8 @@ export function ChatWindow(props: {
 
       const userResponse = await fetch('/api/auth/me')
       const userData = await userResponse.json()
-      const userId = encodeURIComponent(userData?.sub || '')
+      const extUserId = userData?.sub || ''
+      const userId = encodeURIComponent(extUserId.replace('|', ':'))
 
       const popup = window.open(
         `/auth/login?connection=${SERVICE_CONFIGS[service].connection}&ext-primary-user-id=${userId}`,

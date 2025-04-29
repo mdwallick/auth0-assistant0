@@ -16,12 +16,8 @@ import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
 import { getAccessToken } from '@/lib/auth0';
-import { 
-  GmailSearch, 
-  GmailCreateDraft, 
-  GoogleCalendarCreateTool, 
-  GoogleCalendarViewTool 
-} from '@langchain/community/tools';
+import { GmailSearch, GmailCreateDraft } from '@langchain/community/tools/gmail';
+import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
 
 // import Microsoft tools
 import {
