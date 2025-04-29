@@ -13,11 +13,8 @@ const toolSchema = z.object({
 export const GoogleMailReadTool = tool(
   async ({ query, maxResults = 5, labelIds = ['INBOX'] }) => {
     try {
-      const token = await getGoogleAccessToken()
-      const gmail = google.gmail({ 
-        version: 'v1', 
-        auth: new google.auth.OAuth2().setCredentials({ access_token: token })
-      })
+      const auth = await getGoogleClient()
+      const gmail = google.gmail({ version: 'v1', auth })
       
       const response = await gmail.users.messages.list({
         userId: 'me',
