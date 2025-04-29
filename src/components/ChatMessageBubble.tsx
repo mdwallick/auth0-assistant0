@@ -2,92 +2,34 @@ import type { Message } from 'ai'
 import { MemoizedMarkdown } from './MemoizedMarkdown'
 import { Button } from './ui/button'
 import { LoaderCircle } from 'lucide-react'
-import { toast } from 'sonner'
-import { cn } from '@/utils/cn'
+import { ServiceAuthDialog } from './ServiceAuthDialog'
+import { useState } from 'react'
+import type { SupportedService } from '@/lib/services'
 
 interface ChatMessageBubbleProps {
   message: Message
   aiEmoji?: string
   isLoading?: boolean
+  onServiceConnect?: (service: SupportedService) => void
 }
 
-export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBubbleProps) {
-  const handleAuthClick = async (service: 'microsoft' | 'salesforce' | 'google') => {
-    const width = 500
-    const height = 600
-    const left = window.screenX + (window.outerWidth - width) / 2
-    const top = window.screenY + (window.outerHeight - height) / 2
-
-    // Set up message listener
-    const messageHandler = async (event: MessageEvent) => {
-      if (event.data.type === 'AUTH_COMPLETE') {
-        window.removeEventListener('message', messageHandler)
-      } else if (event.data.type === 'AUTH_ERROR') {
-        window.removeEventListener('message', messageHandler)
-        toast.error(`Failed to connect: ${event.data.error}`)
-      }
-    }
-
-    window.addEventListener('message', messageHandler)
-
-    // Get user ID from current session
-    const userResponse = await fetch('/api/auth/me')
-    const userData = await userResponse.json()
-    const extUserId = userData?.sub || ''
-    const userId = encodeURIComponent(extUserId.replace('|', ':'))
-
-    const popup = window.open(
-      `/auth/login?connection=${service}&ext-primary-user-id=${userId}`,
-      'Auth0 Login',
-      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
-    )
-
-    if (!popup) {
-      toast.error('Please enable popups for this site')
-      return
-    }
-
-    toast.info('Waiting for authentication...')
-
-    // Poll for popup closure
-    const pollTimer = window.setInterval(async () => {
-      if (popup.closed) {
-        window.clearInterval(pollTimer)
-
-        // Wait a moment for service registration to complete
-        await new Promise((resolve) => setTimeout(resolve, 3000))
-
-        window.location.reload() // Refresh to update auth state
-      }
-    }, 200)
-  }
+export function ChatMessageBubble({ message, aiEmoji, isLoading, onServiceConnect }: ChatMessageBubbleProps) {
+  const [serviceToAuth, setServiceToAuth] = useState<SupportedService | null>(null)
 
   // Check if message contains service connection request
-  const checkForServiceRequest = (content: string) => {
+  const checkForServiceRequest = (content: string): SupportedService | null => {
     const lowerContent = content.toLowerCase()
-    if (
-      lowerContent.includes('microsoft') &&
-      (lowerContent.includes('connect') ||
-        lowerContent.includes('authenticate') ||
-        lowerContent.includes('login') ||
-        lowerContent.includes('sign in'))
-    ) {
+    if (lowerContent.includes('microsoft') && 
+      (lowerContent.includes('connect') || lowerContent.includes('authenticate') || 
+       lowerContent.includes('login') || lowerContent.includes('sign in'))) {
       return 'microsoft'
-    } else if (
-      lowerContent.includes('salesforce') &&
-      (lowerContent.includes('connect') ||
-        lowerContent.includes('authenticate') ||
-        lowerContent.includes('login') ||
-        lowerContent.includes('sign in'))
-    ) {
+    } else if (lowerContent.includes('salesforce') && 
+      (lowerContent.includes('connect') || lowerContent.includes('authenticate') || 
+       lowerContent.includes('login') || lowerContent.includes('sign in'))) {
       return 'salesforce'
-    } else if (
-      lowerContent.includes('google') &&
-      (lowerContent.includes('connect') ||
-        lowerContent.includes('authenticate') ||
-        lowerContent.includes('login') ||
-        lowerContent.includes('sign in'))
-    ) {
+    } else if (lowerContent.includes('google') && 
+      (lowerContent.includes('connect') || lowerContent.includes('authenticate') || 
+       lowerContent.includes('login') || lowerContent.includes('sign in'))) {
       return 'google'
     }
     return null
@@ -97,13 +39,11 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
 
   return (
     <>
-      <div
-        className={cn(
-          `rounded-[24px] max-w-fit mb-8 flex flex-col`,
-          message.role === 'user' ? 'bg-secondary text-secondary-foreground px-4 py-2' : null,
-          message.role === 'user' ? 'ml-auto' : 'mr-auto',
-        )}
-      >
+      <div className={`rounded-[24px] max-w-fit mb-8 flex flex-col ${
+        message.role === 'user' 
+          ? 'bg-secondary text-secondary-foreground px-4 py-2 ml-auto' 
+          : 'mr-auto'
+      }`}>
         {message.role !== 'user' && (
           <div className="mr-4 border bg-secondary -mt-2 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center">
             {aiEmoji}
@@ -116,40 +56,27 @@ export function ChatMessageBubble({ message, aiEmoji, isLoading }: ChatMessageBu
               <span>Thinking...</span>
             </div>
           ) : (
-            <MemoizedMarkdown
-              components={{
-                button: ({ node, ...props }) => {
-                  const service = props.className?.includes('microsoft')
-                    ? 'microsoft'
-                    : props.className?.includes('salesforce')
-                      ? 'salesforce'
-                      : props.className?.includes('google')
-                        ? 'google'
-                        : null
-
-                  if (service) {
-                    return (
-                      <Button variant="outline" onClick={() => handleServiceAuth(service)} className="mt-2">
-                        Connect {service}
-                      </Button>
-                    )
-                  }
-                  return <Button {...props} />
-                },
-              }}
-            >
-              {message.content}
-            </MemoizedMarkdown>
+            <MemoizedMarkdown>{message.content}</MemoizedMarkdown>
           )}
         </div>
         {service && (
           <div className="mt-2">
-            <Button onClick={() => handleAuthClick(service)} variant="outline">
+            <Button onClick={() => setServiceToAuth(service)} variant="outline">
               Connect to {service.charAt(0).toUpperCase() + service.slice(1)}
             </Button>
           </div>
         )}
       </div>
+
+      <ServiceAuthDialog
+        service={serviceToAuth!}
+        isOpen={!!serviceToAuth}
+        onOpenChange={(open) => {
+          if (!open) {
+            setServiceToAuth(null)
+          }
+        }}
+      />
     </>
   )
 }
