@@ -38,16 +38,39 @@ export const MicrosoftFilesWriteTool = tool(
         templateType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       }
 
-      // Create document with content in a single operation
-      const newFile = await client.api(`/me/drive/root:${path}:/content`)
-        .header('Content-Type', templateType)
-        .put(content)
+      if (type === 'docx') {
+        // Create a basic Word document with proper formatting
+        const wordContent = `
+          <html>
+            <head>
+              <meta charset='utf-8'>
+            </head>
+            <body>
+              ${content.split('\n').map(line => `<p>${line}</p>`).join('')}
+            </body>
+          </html>
+        `
+        const newFile = await client.api(`/me/drive/root:${path}:/content`)
+          .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+          .put(wordContent)
 
-      return JSON.stringify({
-        status: 'success',
-        message: `Office document at ${path} was successfully created/updated`,
-        fileId: newFile.id
-      })
+        return JSON.stringify({
+          status: 'success',
+          message: `Word document at ${path} was successfully created/updated`,
+          fileId: newFile.id
+        })
+      } else if (type === 'xlsx') {
+        // For Excel files, maintain current behavior
+        const newFile = await client.api(`/me/drive/root:${path}:/content`)
+          .header('Content-Type', templateType)
+          .put(content)
+
+        return JSON.stringify({
+          status: 'success',
+          message: `Excel document at ${path} was successfully created/updated`,
+          fileId: newFile.id
+        })
+      }
     } catch (e: any) {
       console.error('Microsoft Files Write tool error:', e)
       return JSON.stringify({
