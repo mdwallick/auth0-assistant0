@@ -15,10 +15,13 @@ import { getConnectedServices } from '@/lib/auth0'
 import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
-import { getGoogleAccessToken } from '@/lib/auth0';
-import { GmailSearch } from '@langchain/community/tools/gmail';
-import { GmailCreateDraft } from '@langchain/community/tools/gmail';
-import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
+import { getAccessToken } from '@/lib/auth0';
+import { 
+  GmailSearch, 
+  GmailCreateDraft, 
+  GoogleCalendarCreateTool, 
+  GoogleCalendarViewTool 
+} from '@langchain/community/tools';
 
 // import Microsoft tools
 import {
@@ -84,6 +87,35 @@ const getAvailableTools = async (intent?: string) => {
 
   if (activeServices.includes('salesforce') && intent === 'salesforce') {
     tools.push(SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool)
+  }
+
+  if (activeServices.includes('google')) {
+    const googleTools = {
+      gmail: [
+        new GmailSearch({ 
+          credentials: async () => ({ accessToken: await getAccessToken('google') })
+        }),
+        new GmailCreateDraft({ 
+          credentials: async () => ({ accessToken: await getAccessToken('google') })
+        })
+      ],
+      calendar: [
+        new GoogleCalendarCreateTool({ 
+          credentials: async () => ({ accessToken: await getAccessToken('google') })
+        }),
+        new GoogleCalendarViewTool({ 
+          credentials: async () => ({ accessToken: await getAccessToken('google') })
+        })
+      ]
+    }
+
+    if (intent === 'mail') {
+      tools.push(...googleTools.gmail)
+    } else if (intent === 'calendar') {
+      tools.push(...googleTools.calendar)
+    } else {
+      tools.push(...[...googleTools.gmail, ...googleTools.calendar])
+    }
   }
 
   return tools
