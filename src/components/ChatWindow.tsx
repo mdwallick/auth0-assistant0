@@ -177,18 +177,33 @@ export function ChatWindow(props: {
         window.addEventListener('message', messageHandler)
       })
 
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Wait for auth to complete
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Get updated service status
+      const statusResponse = await fetch('/api/services/status')
+      const statusData = await statusResponse.json()
+      
+      // Format service status message
+      const serviceStatus = statusData.activeServices.map((svc: string) => 
+        `- ${svc}: ✅ Connected`
+      ).join('\n')
+      
+      const inactiveServices = ['microsoft', 'salesforce', 'google']
+        .filter(svc => !statusData.activeServices.includes(svc))
+        .map(svc => `- ${svc}: ❌ Not Connected`)
+        .join('\n')
+
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `Successfully connected to ${service}!`
+        content: `Successfully connected to ${service}!\n\nCurrent service status:\n${serviceStatus}\n${inactiveServices}`
       }])
-      await checkServiceStatus()
     } catch (error) {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `Failed to connect to ${service}: ${error.message}`
+        content: `Failed to connect to ${service}: ${error.message}\n\nPlease try again or contact support if the issue persists.`
       }])
     }
   }
