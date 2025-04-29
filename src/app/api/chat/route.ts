@@ -86,31 +86,23 @@ const getAvailableTools = async (intent?: string) => {
   }
 
   if (activeServices.includes('google')) {
-    const googleTools = {
-      gmail: [
-        new GmailSearch({ 
-          credentials: async () => ({ accessToken: await getAccessToken('google') })
-        }),
-        new GmailCreateDraft({ 
-          credentials: async () => ({ accessToken: await getAccessToken('google') })
-        })
-      ],
-      calendar: [
-        new GoogleCalendarCreateTool({ 
-          credentials: async () => ({ accessToken: await getAccessToken('google') })
-        }),
-        new GoogleCalendarViewTool({ 
-          credentials: async () => ({ accessToken: await getAccessToken('google') })
-        })
-      ]
-    }
+    const getGoogleCreds = async () => ({
+      accessToken: await getAccessToken('google')
+    });
+
+    const googleTools = [
+      new GmailSearch({ credentials: getGoogleCreds }),
+      new GmailCreateDraft({ credentials: getGoogleCreds }),
+      new GoogleCalendarCreateTool({ credentials: getGoogleCreds }),
+      new GoogleCalendarViewTool({ credentials: getGoogleCreds })
+    ];
 
     if (intent === 'mail') {
-      tools.push(...googleTools.gmail)
+      tools.push(googleTools[0], googleTools[1]);
     } else if (intent === 'calendar') {
-      tools.push(...googleTools.calendar)
+      tools.push(googleTools[2], googleTools[3]);
     } else {
-      tools.push(...[...googleTools.gmail, ...googleTools.calendar])
+      tools.push(...googleTools);
     }
   }
 
