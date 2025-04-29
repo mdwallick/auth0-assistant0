@@ -58,45 +58,33 @@ Use Salesforce tools to query or create records in Salesforce.
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `
 
-const getAvailableTools = async () => {
-  const tools: ToolInterface[] = [new Calculator(), new SerpAPI(), ServiceStatusTool]
+const getAvailableTools = async (intent?: string) => {
+  const tools: ToolInterface[] = [ServiceStatusTool]
   const activeServices = await getConnectedServices()
 
+  // Only load specific tools based on intent or context
   if (activeServices.includes('microsoft')) {
-    tools.push(
-      MicrosoftCalendarReadTool,
-      MicrosoftCalendarWriteTool,
-      MicrosoftFilesListTool,
-      MicrosoftFilesReadTool,
-      MicrosoftFilesWriteTool,
-      MicrosoftMailReadTool,
-      MicrosoftMailWriteTool,
-    )
+    const microsoftTools = {
+      files: [MicrosoftFilesListTool, MicrosoftFilesReadTool, MicrosoftFilesWriteTool],
+      calendar: [MicrosoftCalendarReadTool, MicrosoftCalendarWriteTool],
+      mail: [MicrosoftMailReadTool, MicrosoftMailWriteTool]
+    }
+
+    if (intent === 'files') {
+      tools.push(...microsoftTools.files)
+    } else if (intent === 'calendar') {
+      tools.push(...microsoftTools.calendar)
+    } else if (intent === 'mail') {
+      tools.push(...microsoftTools.mail)
+    } else {
+      // If no specific intent, load all Microsoft tools
+      tools.push(...[...microsoftTools.files, ...microsoftTools.calendar, ...microsoftTools.mail])
+    }
   }
 
-  if (activeServices.includes('salesforce')) {
+  if (activeServices.includes('salesforce') && intent === 'salesforce') {
     tools.push(SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool)
   }
-
-  // if (serviceRegistry.isServiceActive('google')) {
-  //     const accessToken = await getGoogleAccessToken()
-  //     // Provide the access token to the Gmail tools
-  //     const gmailParams = {
-  //       credentials: { accessToken },
-  //     };
-
-  //     const googleCalendarParams = {
-  //       credentials: { accessToken, calendarId: 'primary' },
-  //       //model: llm,
-  //     };
-
-  //     tools.push(
-  //         new GmailSearch(gmailParams),
-  //         new GmailCreateDraft(gmailParams),
-  //         new GoogleCalendarCreateTool(googleCalendarParams),
-  //         new GoogleCalendarViewTool(googleCalendarParams)
-  //     );
-  // }
 
   return tools
 }
@@ -115,7 +103,10 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const tools = await getAvailableTools()
+    //Infer intent from user message -  This is a placeholder and needs a more robust implementation
+    const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
+
+    const tools = await getAvailableTools(intent)
 
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
