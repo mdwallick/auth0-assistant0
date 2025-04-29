@@ -38,18 +38,10 @@ export const MicrosoftFilesWriteTool = tool(
         templateType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       }
 
-      // Create empty document
-      const newFile = await client.api(`/me/drive/root:${path}`).put({
-        name: fileName,
-        '@microsoft.graph.conflictBehavior': 'replace',
-        'file': { mimeType: templateType }
-      })
-
-      // Update content
-      if (content) {
-        await client.api(`/me/drive/items/${newFile.id}/content`)
-          .put(content)
-      }
+      // Create document with content in a single operation
+      await client.api(`/me/drive/root:${path}:/content`)
+        .header('Content-Type', templateType)
+        .put(content)
 
       return JSON.stringify({
         status: 'success',
