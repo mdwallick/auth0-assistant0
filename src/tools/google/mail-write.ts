@@ -25,7 +25,7 @@ export const GoogleMailWriteTool = tool(
         `Subject: ${subject}`,
         '',
         body
-      ].join('\r\n')
+      ].filter(line => line !== '').join('\r\n')
 
       const encodedMessage = Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_')
 
