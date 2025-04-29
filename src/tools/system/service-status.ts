@@ -1,6 +1,11 @@
 
 import { tool } from '@langchain/core/tools'
 import { auth0, type SupportedService } from '@/lib/auth0'
+import { z } from 'zod'
+
+const inputSchema = z.object({
+  input: z.string().optional().nullable()
+})
 
 export const ServiceStatusTool = tool(
     async (_, runManager) => {
@@ -42,6 +47,7 @@ export const ServiceStatusTool = tool(
     {
         name: 'ServiceStatusTool',
         description: 'Check which services are currently registered and active',
+        schema: inputSchema,
         tags: ['status-check']
     }
 )
