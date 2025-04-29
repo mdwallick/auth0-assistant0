@@ -39,17 +39,17 @@ export const MicrosoftFilesWriteTool = tool(
       }
 
       if (type === 'docx') {
-        // Create a basic Word document with proper formatting
-        const wordContent = `
-          <html>
-            <head>
-              <meta charset='utf-8'>
-            </head>
-            <body>
-              ${content.split('\n').map(line => `<p>${line}</p>`).join('')}
-            </body>
-          </html>
-        `
+        // Create a Word document using Office Open XML format
+        const wordContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?mso-application progid="Word.Document"?>
+<w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml">
+  <w:body>
+    ${content.split('\n').map(line => 
+      `<w:p><w:r><w:t>${line.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]))}</w:t></w:r></w:p>`
+    ).join('\n')}
+  </w:body>
+</w:wordDocument>`
+
         const newFile = await client.api(`/me/drive/root:${path}:/content`)
           .header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
           .put(wordContent)
