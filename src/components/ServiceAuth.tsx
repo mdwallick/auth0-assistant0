@@ -18,7 +18,9 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
       .then(res => res.json())
       .then(data => {
         const connectedServices = data.connected_services || []
+        const idToken = data.id_token || ''
         setIsActive(connectedServices.some(cs => cs.connection === SERVICE_CONFIGS[service].connection))
+        window.localStorage.setItem('id_token', idToken)
       })
       .catch(console.error)
   }, [service])
