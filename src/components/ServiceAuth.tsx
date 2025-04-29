@@ -13,14 +13,15 @@ interface ServiceAuthProps {
 export function ServiceAuth({ service }: ServiceAuthProps) {
   const [isActive, setIsActive] = useState(false)
 
+  const [idToken, setIdToken] = useState('')
+  
   useEffect(() => {
     fetch('/api/auth/me')
       .then(res => res.json())
       .then(data => {
         const connectedServices = data.connected_services || []
-        const idToken = data.id_token || ''
         setIsActive(connectedServices.some(cs => cs.connection === SERVICE_CONFIGS[service].connection))
-        window.localStorage.setItem('id_token', idToken)
+        setIdToken(data.id_token || '')
       })
       .catch(console.error)
   }, [service])
@@ -38,8 +39,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
       const userId = encodeURIComponent(extUserId.replace('|', ':'))
 
       //const popup_url = `/auth/login?connection=${SERVICE_CONFIGS[service].connection}&ext-primary-user-id=${userId}`
-      const id_token = ''
-      const popup_url = `/auth/login?scope=link_account&id_token_hint=${id_token}&requested_connection=${SERVICE_CONFIGS[service].connection}`
+      const popup_url = `/auth/login?scope=link_account&id_token_hint=${idToken}&requested_connection=${SERVICE_CONFIGS[service].connection}`
       console.log('popup_url', popup_url)
       
       const popup = window.open(
