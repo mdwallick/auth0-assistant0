@@ -60,16 +60,30 @@ export const MicrosoftFilesWriteTool = tool(
           fileId: newFile.id
         })
       } else if (type === 'xlsx') {
-        // For Excel files, maintain current behavior
+        // For Excel files, create a proper XLSX workbook
+        const XLSX = require('xlsx');
+        
+        // Convert semicolon-separated content to array
+        const rows = content.split('\n').map(row => row.split(';'));
+        
+        // Create workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        
+        // Generate Excel buffer
+        const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        
+        // Upload to OneDrive
         const newFile = await client.api(`/me/drive/root:${path}:/content`)
           .header('Content-Type', templateType)
-          .put(content)
+          .put(excelBuffer);
 
         return JSON.stringify({
           status: 'success',
           message: `Excel document at ${path} was successfully created/updated`,
           fileId: newFile.id
-        })
+        });
       }
     } catch (e: any) {
       console.error('Microsoft Files Write tool error:', e)
