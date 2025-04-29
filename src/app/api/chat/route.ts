@@ -16,6 +16,12 @@ import { ServiceStatusTool } from '@/tools/system/service-status'
 
 // import Google tools
 import { getAccessToken } from '@/lib/auth0';
+import {
+  GoogleMailReadTool,
+  GoogleMailWriteTool,
+  GoogleCalendarReadTool,
+  GoogleCalendarWriteTool
+} from '@/tools/google'
 
 // import Microsoft tools
 import {
@@ -88,17 +94,18 @@ const getAvailableTools = async (intent?: string) => {
       accessToken: await getAccessToken('google')
     })
 
-    const googleTools = [
-      
-    ]
+    const googleTools = {
+      mail: [new GoogleMailReadTool(), new GoogleMailWriteTool()],
+      calendar: [new GoogleCalendarReadTool(), new GoogleCalendarWriteTool()]
+    }
 
-    // if (intent === 'mail') {
-    //   tools.push(googleTools[0], googleTools[1])
-    // } else if (intent === 'calendar') {
-    //   tools.push(googleTools[2], googleTools[3])
-    // } else {
-    //   tools.push(...googleTools)
-    // }
+    if (intent === 'mail') {
+      tools.push(...googleTools.mail)
+    } else if (intent === 'calendar') {
+      tools.push(...googleTools.calendar)
+    } else {
+      tools.push(...[...googleTools.mail, ...googleTools.calendar])
+    }
   }
 
   return tools
