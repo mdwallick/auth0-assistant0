@@ -1,7 +1,7 @@
+
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
-import { getMicrosoftAccessToken } from './auth'
 
 const toolSchema = z.object({
   subject: z.string().describe('The title of the event'),
@@ -13,52 +13,59 @@ const toolSchema = z.object({
   eventId: z.string().optional().nullable().describe('Event ID for updating existing events'),
 })
 
-export const MicrosoftCalendarWriteTool = tool(
-  async ({ subject, startDateTime, endDateTime, timeZone = 'UTC', location, attendees = [], eventId }) => {
-    const token = await getMicrosoftAccessToken()
+export class MicrosoftCalendarWriteTool {
+  private accessToken: string;
 
-    const client = Client.init({
-      authProvider: (done) => done(null, token),
-    })
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
 
-    const event = {
-      subject,
-      start: {
-        dateTime: startDateTime,
-        timeZone,
+  getTool() {
+    return tool(
+      async ({ subject, startDateTime, endDateTime, timeZone = 'UTC', location, attendees = [], eventId }) => {
+        const client = Client.init({
+          authProvider: (done) => done(null, this.accessToken),
+        })
+
+        const event = {
+          subject,
+          start: {
+            dateTime: startDateTime,
+            timeZone,
+          },
+          end: {
+            dateTime: endDateTime,
+            timeZone,
+          },
+          location: location ? { displayName: location } : undefined,
+          attendees:
+            attendees?.map((email) => ({
+              emailAddress: { address: email },
+              type: 'required',
+            })) || [],
+        }
+
+        console.log(eventId ? 'Updating event:' : 'Creating event:', event)
+
+        if (eventId) {
+          await client.api(`/me/events/${eventId}`).patch(event)
+          return JSON.stringify({
+            status: 'success',
+            message: `Event "${subject}" updated successfully`,
+          })
+        } else {
+          await client.api('/me/events').post(event)
+          return JSON.stringify({
+            status: 'success',
+            message: `Event "${subject}" created successfully from ${startDateTime} to ${endDateTime}`,
+          })
+        }
       },
-      end: {
-        dateTime: endDateTime,
-        timeZone,
-      },
-      location: location ? { displayName: location } : undefined,
-      attendees:
-        attendees?.map((email) => ({
-          emailAddress: { address: email },
-          type: 'required',
-        })) || [],
-    }
-
-    console.log(eventId ? 'Updating event:' : 'Creating event:', event)
-
-    if (eventId) {
-      await client.api(`/me/events/${eventId}`).patch(event)
-      return JSON.stringify({
-        status: 'success',
-        message: `Event "${subject}" updated successfully`,
-      })
-    } else {
-      await client.api('/me/events').post(event)
-      return JSON.stringify({
-        status: 'success',
-        message: `Event "${subject}" created successfully from ${startDateTime} to ${endDateTime}`,
-      })
-    }
-  },
-  {
-    name: 'MicrosoftCalendarWriteTool',
-    description:
-      "Create or update an event in the user's Microsoft calendar. Provide eventId to update an existing event.",
-    schema: toolSchema,
-  },
-)
+      {
+        name: 'MicrosoftCalendarWriteTool',
+        description: "Create or update an event in the user's Microsoft calendar. Provide eventId to update an existing event.",
+        schema: toolSchema,
+      }
+    )
+  }
+}

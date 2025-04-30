@@ -1,7 +1,7 @@
+
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
-import { getMicrosoftAccessToken } from './auth'
 
 type FileItem = {
   name: string
@@ -14,29 +14,38 @@ const toolSchema = z.object({
   path: z.string().optional().nullable().describe('Path to the folder (e.g. /Documents). Leave blank for root.'),
 })
 
-export const MicrosoftFilesListTool = tool(
-  async ({ path = '' }) => {
-    const token = await getMicrosoftAccessToken()
-    const client = Client.init({
-      authProvider: (done) => done(null, token),
-    })
+export class MicrosoftFilesListTool {
+  private accessToken: string;
 
-    const drivePath = path ? `/me/drive/root:/${path}:/children` : `/me/drive/root/children`
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
 
-    const res = await client.api(drivePath).get()
+  getTool() {
+    return tool(
+      async ({ path = '' }) => {
+        const client = Client.init({
+          authProvider: (done) => done(null, this.accessToken),
+        })
 
-    return JSON.stringify(
-      res.value.map((item: FileItem) => ({
-        name: item.name,
-        itemType: item.folder ? 'folder' : 'file',
-        lastModified: item.lastModifiedDateTime,
-        size: item.size,
-      })),
+        const drivePath = path ? `/me/drive/root:/${path}:/children` : `/me/drive/root/children`
+
+        const res = await client.api(drivePath).get()
+
+        return JSON.stringify(
+          res.value.map((item: FileItem) => ({
+            name: item.name,
+            itemType: item.folder ? 'folder' : 'file',
+            lastModified: item.lastModifiedDateTime,
+            size: item.size,
+          })),
+        )
+      },
+      {
+        name: 'MicrosoftFilesListTool',
+        description: "List files from the user's OneDrive folder",
+        schema: toolSchema,
+      }
     )
-  },
-  {
-    name: 'MicrosoftFilesListTool',
-    description: "List files from the user's OneDrive folder",
-    schema: toolSchema,
-  },
-)
+  }
+}
