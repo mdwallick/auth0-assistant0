@@ -33,6 +33,7 @@ import {
   MicrosoftFilesWriteTool,
   MicrosoftFilesListTool,
 } from '@/tools/microsoft'
+import { getMicrosoftAccessToken } from '@/tools/microsoft/auth'
 
 // import Salesforce tools
 import { SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool } from '@/tools/salesforce'
@@ -131,6 +132,7 @@ export async function POST(req: NextRequest) {
     const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
 
     const tools = await getAvailableTools(intent)
+    const accessToken = await getMicrosoftAccessToken() // Added line to get access token
 
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
