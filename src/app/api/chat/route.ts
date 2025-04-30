@@ -44,27 +44,78 @@ const AGENT_SYSTEM_TEMPLATE = `
 You are a personal assistant named Assistant0. You are a helpful assistant that can answer questions and help with tasks. 
 You have access to a set of tools, use the tools as needed to answer the user's question.
 
-Before using any service-specific tools (Microsoft, Salesforce, Google), check if the service is active using the ServiceStatusTool.
-If a requested service is not active, inform the user they need to authenticate with that service first.
+TOOL SELECTION RULES:
+1. Always check service status first using ServiceStatusTool before using any service-specific tools
+2. Only use tools that are directly relevant to the user's request
+3. Do not use calendar tools unless explicitly asked about calendar/schedule/meetings
+4. Do not mix tools from different services unless specifically requested
+
+SERVICE-SPECIFIC INSTRUCTIONS:
+- Salesforce: Use for CRM queries, opportunities, accounts, contacts
+  - SalesforceQueryTool: For SOQL queries
+  - SalesforceCreateTool: For creating new records
+  - SalesforceSearchTool: For text search across objects
+
+- Microsoft:
+  - OneDrive (files): Use for document/file operations
+  - Calendar: Use only for meeting/schedule related tasks
+  - Email: Use for Outlook email operations
+
+- Google:
+  - Drive: Use for Google document/file operations
+  - Calendar: Use only for meeting/schedule related tasks
+  - Gmail: Use for email operations
 
 Current time information:
 - Current date and time: ${new Date().toLocaleString('en-US', { timeZone: 'US/Central' })} US/Central
 - Current ISO timestamp: ${new Date().toISOString()}
 
-IMPORTANT: When using tools that create or modify data (like calendar events, files, or emails):
+IMPORTANT: For data modification operations:
 1. Call the tool exactly once
 2. Wait for the response
 3. Do not retry on failure
 4. Report the result to the user
 
-Use Salesforce tools (SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool) to interact with Salesforce records.
-Use Microsoft calendar tools only for calendar-related queries.
-Use Google calendar tools only for calendar-related queries.
-Use Microsoft file tools only for OneDrive file operations.
-Use Google mail tools only for Gmail operations.
-
-Render the email body as a markdown block. Do not wrap it in code blocks.
+Render email bodies as markdown blocks without code block wrapping.
 `
+
+function inferIntent(message: string): string | undefined {
+  message = message.toLowerCase()
+  
+  // Service-specific keywords
+  if (message.includes('salesforce') || 
+      message.includes('opportunity') || 
+      message.includes('account') || 
+      message.includes('contact')) {
+    return 'salesforce'
+  }
+  
+  // File operations
+  if (message.includes('onedrive') || 
+      message.includes('file') || 
+      message.includes('document') ||
+      message.includes('folder')) {
+    return 'files'
+  }
+  
+  // Calendar operations
+  if (message.includes('calendar') || 
+      message.includes('schedule') || 
+      message.includes('meeting') ||
+      message.includes('appointment')) {
+    return 'calendar'
+  }
+  
+  // Email operations
+  if (message.includes('email') || 
+      message.includes('mail') || 
+      message.includes('gmail') ||
+      message.includes('outlook')) {
+    return 'mail'
+  }
+  
+  return undefined
+}
 
 const getAvailableTools = async (intent?: string) => {
   const tools: ToolInterface[] = [ServiceStatusTool]
@@ -161,8 +212,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    //Infer intent from user message -  This is a placeholder and needs a more robust implementation
-    const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
+    const lastMessage = body.messages[body.messages.length - 1].content
+    const intent = inferIntent(lastMessage)
     const tools = await getAvailableTools(intent)
 
     const llm = new ChatOpenAI({
