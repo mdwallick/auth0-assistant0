@@ -1,31 +1,35 @@
 
+export interface Service {
+  connection: 'windowslive' | 'google-oauth2' | 'salesforce-dev';
+  isSocial: boolean;
+  provider: 'microsoft' | 'google' | 'salesforce';
+  user_id: string;
+}
+
 export const SERVICES = {
   microsoft: {
-    name: 'microsoft',
     connection: 'windowslive',
-    scope: 'offline_access files.readwrite.all mail.readwrite calendars.readwrite',
-  },
-  salesforce: {
-    name: 'salesforce',
-    connection: 'salesforce-dev',
-    scope: 'api refresh_token',
+    isSocial: true,
+    provider: 'microsoft',
+    scope: 'offline_access files.readwrite.all mail.readwrite calendars.readwrite'
   },
   google: {
-    name: 'google',
     connection: 'google-oauth2',
-    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/calendar',
+    isSocial: true,
+    provider: 'google',
+    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/calendar'
   },
+  salesforce: {
+    connection: 'salesforce-dev',
+    isSocial: false,
+    provider: 'salesforce',
+    scope: 'api refresh_token'
+  }
 } as const;
 
 export type SupportedService = keyof typeof SERVICES;
-export type ServiceConfig = typeof SERVICES[SupportedService];
-export type Auth0Connection = typeof SERVICES[SupportedService]['connection'];
 
-export function getAuth0Connection(service: SupportedService): Auth0Connection {
-  return SERVICES[service].connection;
-}
-
-export function getServiceFromConnection(connection: Auth0Connection): SupportedService | undefined {
+export function getServiceByConnection(connection: Service['connection']): SupportedService | undefined {
   const entry = Object.entries(SERVICES).find(([_, config]) => config.connection === connection);
   return entry ? entry[0] as SupportedService : undefined;
 }
