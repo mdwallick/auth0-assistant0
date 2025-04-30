@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AccessTokenError } from '@auth0/nextjs-auth0/errors'
 import type { SessionData } from '@auth0/nextjs-auth0/types'
 import { auth0 } from "@/lib/auth0"
+import type { ConnectedService } from "@/lib/services"
 
 // Define a type for the expected UserInfo shape from /userinfo
 interface UserInfo {
@@ -29,7 +30,7 @@ interface UserInfo {
   };
   updated_at?: number;
   // Add any custom claims expected from /userinfo
-  //connected_services?: Array<{ connection: string; provider: string; is_social: boolean }>
+  connected_services?: Array<ConnectedService>
   [key: string]: any; // Allow other properties
 }
 
