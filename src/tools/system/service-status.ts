@@ -1,3 +1,4 @@
+
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { auth0 } from '@/lib/auth0'
@@ -12,15 +13,7 @@ export class ServiceStatusTool {
 
   getTool() {
     return tool(
-      async ({ skipStatusCheck = false }) => {
-        // Skip status check if flag is set
-        if (skipStatusCheck) {
-          return JSON.stringify({
-            status: 'skipped',
-            message: 'Status check skipped to prevent recursion'
-          })
-        }
-
+      async () => {
         try {
           const session = await auth0.getSession()
           const connectedServices = session?.user?.connected_services || []
