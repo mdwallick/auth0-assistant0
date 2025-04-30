@@ -1,11 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
-
 import { auth0 } from '@/lib/auth0'
+
+import type { SupportedService } from '@/lib/services'
 
 /**
  * Middleware to handle authentication using Auth0
  */
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest, response: NextResponse) {
   const authRes = await auth0.middleware(request)
 
   // authentication routes — let the middleware handle it
@@ -22,6 +23,20 @@ export async function middleware(request: NextRequest) {
       console.log('No session found, redirecting to login')
       return NextResponse.redirect(`${origin}/auth/login`)
     }
+
+    const services: SupportedService[] = session.user?.connected_services || []
+    
+    services.forEach(async (service) => {
+      // Refresh token if needed — it will be persisted
+      const opts = {
+        connection: service.connection,
+      }
+      await auth0.getAccessTokenForConnection(opts, request, response)
+      //if (service.connection === 'google-oauth2') {
+        console.log('Refreshing token for', service.connection)
+      //}
+    })
+    
   } catch (error) {
     console.error('Auth0 session error:', error)
     return NextResponse.redirect(`${origin}/auth/login`)

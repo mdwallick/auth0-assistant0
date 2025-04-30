@@ -1,11 +1,13 @@
 
 import { tool } from '@langchain/core/tools'
-import { auth0, type SupportedService } from '@/lib/auth0'
+import { auth0 } from '@/lib/auth0'
 import { z } from 'zod'
+
+import type { SupportedService } from '@/lib/services'
 
 const inputSchema = z.object({
   input: z.string().nullish(),
-  skipStatusCheck: z.boolean().optional().default(false)
+  skipStatusCheck: z.boolean().optional().nullable().default(false)
 })
 
 export const ServiceStatusTool = tool(

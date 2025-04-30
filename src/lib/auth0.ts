@@ -13,7 +13,10 @@ export const auth0 = new Auth0Client({
   appBaseUrl: process.env.APP_BASE_URL!,
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
-  scopes: process.env.AUTH0_SCOPES!,
+  authorizationParameters: {
+    scope: process.env.AUTH0_SCOPES || "openid profile email",
+    connection: process.env.AUTH0_CONNECTION_NAME || "Username-Password-Authentication",
+  },
 
   sessionStore: {
     async get(id) {

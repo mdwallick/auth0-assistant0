@@ -32,7 +32,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="twitter:image" content="/images/og-image.png" />
       </head>
       <body className={publicSans.className}>
-        <ClientAuthProvider>
         <div className="bg-secondary grid grid-rows-[auto,auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
@@ -60,7 +59,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </div>
         <Toaster />
-        </ClientAuthProvider>
       </body>
     </html>
   )
