@@ -43,7 +43,7 @@ export class MicrosoftCalendarReadTool {
         })
       },
       {
-        name: 'MicrosoftCalendarTool',
+        name: 'MicrosoftCalendarReadTool',
         description: "Check a user's schedule between the given date times on their Microsoft calendar",
         schema: toolSchema,
       }
