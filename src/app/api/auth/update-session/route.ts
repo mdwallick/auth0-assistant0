@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AccessTokenError } from '@auth0/nextjs-auth0/errors'
 import type { SessionData } from '@auth0/nextjs-auth0/types'
+import { ManagementClient } from 'auth0'
 import { auth0 } from "@/lib/auth0"
 import type { ConnectedService } from "@/lib/services"
 
@@ -76,19 +77,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         throw new Error("AUTH0_ISSUER_BASE_URL environment variable not set.");
     }
 
-    const userInfoResponse = await fetch(`${issuerBaseUrl}/userinfo`, {
-      headers: {
-        Authorization: `Bearer ${accessToken.token}`,
-      },
+    // Get latest user data from Management API
+    const mgmtClient = new ManagementClient({
+      domain: process.env.AUTH0_DOMAIN!,
+      clientId: process.env.AUTH0_CLIENT_ID!,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET!,
     });
 
-    if (!userInfoResponse.ok) {
-      const errorText = await userInfoResponse.text();
-      console.error('Failed to fetch user info:', userInfoResponse.status, errorText);
-      throw new Error(`Failed to fetch latest user information from Auth0 (${userInfoResponse.status}).`);
-    }
-
-    const latestUserInfo: UserInfo = await userInfoResponse.json();
+    const latestUserInfo = await mgmtClient.users.get({ id: session.user.sub });
 
     // Ensure 'sub' matches - important safety check
     if(latestUserInfo.sub !== session.user.sub) {
