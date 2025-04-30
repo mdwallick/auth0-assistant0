@@ -29,7 +29,7 @@ export const SUPPORTED_SERVICES: Record<string, SupportedService> = {
   salesforce: {
     connection: 'salesforce-dev',
     isSocial: false,
-    provider: 'salesforce',
+    provider: 'oidc',
     scope: 'api refresh_token'
   }
 } as const;
