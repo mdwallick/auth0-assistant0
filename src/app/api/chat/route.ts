@@ -9,6 +9,7 @@ import { convertVercelMessageToLangChainMessage } from '@/utils/message-converte
 import { logToolCallsInDevelopment } from '@/utils/stream-logging'
 import { getAccessToken, getConnectedServices } from '@/lib/auth0'
 import { google } from 'googleapis'
+import { OAuth2Client } from 'google-auth-library'
 
 // import general tools
 import ServiceStatusTool from '@/tools/system/service-status'
@@ -74,10 +75,9 @@ const getAvailableTools = async (intent?: string) => {
     microsoftToken = await getAccessToken('windowslive')
   }
 
-  let googleClient;
+  const googleClient: OAuth2Client = new google.auth.OAuth2()
   if (activeServices.includes('google')) {
     const token = await getAccessToken('google-oauth2')
-    const googleClient = new google.auth.OAuth2()
     googleClient.setCredentials({ access_token: token })
   }
   
@@ -113,7 +113,10 @@ const getAvailableTools = async (intent?: string) => {
 
   if (activeServices.includes('google')) {
     const googleTools = {
-      mail: [GoogleMailReadTool, GoogleMailWriteTool],
+      mail: [
+        new GoogleMailReadTool(googleClient).getTool(),
+        new GoogleMailWriteTool(googleClient).getTool()
+      ],
       calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool],
       files: [GoogleDriveListTool, GoogleDriveReadTool, GoogleDriveWriteTool]
     }
