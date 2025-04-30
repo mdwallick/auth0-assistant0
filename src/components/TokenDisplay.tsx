@@ -1,34 +1,20 @@
-
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
+
+const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function TokenDisplay() {
-  const [session, setSession] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch user data')
-        }
-        return res.json()
-      })
-      .then((data) => {
-        console.log('Session data:', data)
-        setSession(data)
-      })
-      .catch((err) => {
-        console.error('Error fetching session:', err)
-        setError(err.message)
-      })
-  }, [])
+  const { data: session, error, mutate } = useSWR('/api/auth/me', fetcher, {
+    refreshInterval: 0,
+    revalidateOnFocus: false
+  })
 
   if (error) {
     return (
       <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-lg max-w-[768px] mx-auto mb-4">
-        <p className="text-sm text-red-600 dark:text-red-400">Error: {error}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">Error: {error.message}</p>
       </div>
     )
   }

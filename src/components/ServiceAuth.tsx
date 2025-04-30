@@ -104,6 +104,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
 
       console.log('Session update API call successful.');
       await mutate('/api/auth/session'); // Revalidate useUser cache
+      await mutate('/api/auth/me'); // Revalidate TokenDisplay
       console.log('Client-side user data revalidated.');
       // --- End Session Refresh Logic ---
 
