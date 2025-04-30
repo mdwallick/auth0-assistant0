@@ -130,9 +130,10 @@ export async function POST(req: NextRequest) {
 
     //Infer intent from user message -  This is a placeholder and needs a more robust implementation
     const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
-
-    const tools = await getAvailableTools(intent)
-    const accessToken = await getMicrosoftAccessToken() // Added line to get access token
+    const accessToken = await getMicrosoftAccessToken()
+    
+    const calendarTool = new MicrosoftCalendarReadTool(accessToken).getTool()
+    const tools = [...await getAvailableTools(intent), calendarTool]
 
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',

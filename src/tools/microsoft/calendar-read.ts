@@ -7,16 +7,21 @@ const toolSchema = z.object({
   timeMin: z.string().datetime().describe('Start time in ISO 8601 format'),
   timeMax: z.string().datetime().describe('End time in ISO 8601 format'),
   timeZone: z.string().optional().nullable().default('US/Central').describe('Time zone to use for the calendar'),
-  accessToken: z.string().describe('Microsoft Graph API access token')
 })
 
 export class MicrosoftCalendarReadTool {
-  constructor() {
+  private accessToken: string;
+
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
+
+  getTool() {
     return tool(
-      async ({ timeMin, timeMax, timeZone = 'US/Central', accessToken }) => {
+      async ({ timeMin, timeMax, timeZone = 'US/Central' }) => {
         const client = Client.init({
           authProvider: (done) => {
-            done(null, accessToken)
+            done(null, this.accessToken)
           },
         })
 
