@@ -68,7 +68,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       throw error;
     }
 
-
+    console.log('Access token', accessToken)
+    
     // 3. Fetch the latest user profile from Auth0's /userinfo endpoint
     const issuerBaseUrl = process.env.AUTH0_DOMAIN;
     if (!issuerBaseUrl) {
