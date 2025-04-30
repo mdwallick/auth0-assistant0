@@ -8,13 +8,13 @@ import { LangChainTracer } from 'langchain/callbacks'
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters'
 import { logToolCallsInDevelopment } from '@/utils/stream-logging'
 import { getAccessToken, getConnectedServices } from '@/lib/auth0'
-import { google } from 'googleapis'
-import { OAuth2Client } from 'google-auth-library'
 
 // import general tools
 import ServiceStatusTool from '@/tools/system/service-status'
 
 // import Google tools
+import { google } from 'googleapis'
+import { OAuth2Client } from 'google-auth-library'
 import {
   GoogleMailReadTool,
   GoogleMailWriteTool,
@@ -37,6 +37,7 @@ import {
 } from '@/tools/microsoft'
 
 // import Salesforce tools
+import jsforce from 'jsforce'
 import { SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool } from '@/tools/salesforce'
 
 const AGENT_SYSTEM_TEMPLATE = `
@@ -80,6 +81,12 @@ const getAvailableTools = async (intent?: string) => {
     const token = await getAccessToken('google-oauth2')
     googleClient.setCredentials({ access_token: token })
   }
+
+  const salesforceClient = new jsforce.Connection({
+    instanceUrl: process.env.SALESFORCE_LOGIN_URL || 'https://login.salesforce.com',
+    accessToken: await getAccessToken('salesforce-dev'),
+  })
+
   
   // Build tool list based on active services and intent
   const selectedTools = []
@@ -108,7 +115,11 @@ const getAvailableTools = async (intent?: string) => {
   }
 
   if (activeServices.includes('salesforce') && intent === 'salesforce') {
-    selectedTools.push(SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool)
+    selectedTools.push(
+      new SalesforceQueryTool(salesforceClient).getTool(),
+      new SalesforceCreateTool(salesforceClient).getTool(),
+      new SalesforceSearchTool(salesforceClient).getTool()
+    )
   }
 
   if (activeServices.includes('google')) {
@@ -117,8 +128,15 @@ const getAvailableTools = async (intent?: string) => {
         new GoogleMailReadTool(googleClient).getTool(),
         new GoogleMailWriteTool(googleClient).getTool()
       ],
-      calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool],
-      files: [GoogleDriveListTool, GoogleDriveReadTool, GoogleDriveWriteTool]
+      calendar: [
+        new GoogleCalendarReadTool(googleClient).getTool(),
+        new GoogleCalendarWriteTool(googleClient).getTool()
+      ],
+      files: [
+        new GoogleDriveListTool(googleClient).getTool(),
+        new GoogleDriveReadTool(googleClient).getTool(),
+        new GoogleDriveWriteTool(googleClient).getTool()
+      ]
     }
 
     if (intent === 'mail') selectedTools.push(...googleTools.mail)
