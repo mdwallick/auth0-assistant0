@@ -10,7 +10,7 @@ import { logToolCallsInDevelopment } from '@/utils/stream-logging'
 import { getAccessToken, getConnectedServices } from '@/lib/auth0'
 
 // import general tools
-import { ServiceStatusTool } from '@/tools/system/service-status'
+import ServiceStatusTool from '@/tools/system/service-status'
 
 // import Google tools
 import {
