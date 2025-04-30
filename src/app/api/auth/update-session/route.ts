@@ -69,7 +69,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       throw error;
     }
 
-    console.log('Access token', accessToken)
+    //console.log('Access token', accessToken)
     
     // 3. Fetch the latest user profile from Auth0's /userinfo endpoint
     const issuerBaseUrl = process.env.AUTH0_DOMAIN;
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const latestUserInfo = await mgmtClient.users.get({ id: session.user.sub });
 
     // Ensure 'sub' matches - important safety check
-    if(latestUserInfo.sub !== session.user.sub) {
+    if(latestUserInfo.id !== session.user.sub) {
         console.error('User info sub mismatch during session update. Aborting.');
         throw new Error('User identity mismatch during session update.');
     }
