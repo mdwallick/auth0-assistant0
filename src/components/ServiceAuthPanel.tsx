@@ -1,9 +1,12 @@
+
+'use client'
+
 import { useState, useEffect } from 'react'
 import { ServiceAuth } from './ServiceAuth'
-import type { SupportedService } from '@/lib/services'
+import type { ConnectedService } from '@/lib/services'
 
 export function ServiceAuthPanel() {
-  const [connectedServices, setConnectedServices] = useState<SupportedService[]>([])
+  const [connectedServices, setConnectedServices] = useState<ConnectedService[]>([])
 
   useEffect(() => {
     fetch('/api/auth/me')

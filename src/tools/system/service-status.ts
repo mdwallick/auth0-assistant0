@@ -1,4 +1,3 @@
-
 import { tool } from '@langchain/core/tools'
 import { auth0 } from '@/lib/auth0'
 import { z } from 'zod'
@@ -20,18 +19,13 @@ export const ServiceStatusTool = tool(
             });
         }
 
-        const allServices: SupportedService[] = ['microsoft', 'salesforce', 'google'];
+        const allServices = Object.keys(SUPPORTED_SERVICES);
         try {
             const session = await auth0.getSession();
             const connectedServices = session?.user?.connected_services || [];
             const activeServices = connectedServices
-                .map(cs => {
-                    if (cs.connection === 'windowslive') return 'microsoft';
-                    if (cs.connection === 'google-oauth2') return 'google';
-                    if (cs.connection === 'salesforce-dev') return 'salesforce';
-                    return null;
-                })
-                .filter((s): s is SupportedService => s !== null);
+                .map(cs => getServiceFromConnection(cs.connection))
+                .filter((service): service is string => service !== undefined);
 
             return JSON.stringify({
                 activeServices,

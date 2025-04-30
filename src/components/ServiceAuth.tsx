@@ -1,137 +1,105 @@
-'use client'; // Assuming this component needs client-side hooks/interaction
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useSWRConfig } from 'swr'; // <-- Import useSWRConfig
-import { Button } from '@/components/ui/button';
-import { SERVICES } from '@/lib/services';
-import { toast } from 'sonner';
-import type { Service } from '@/lib/services';
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { SUPPORTED_SERVICES } from '@/lib/services'
+import { toast } from 'sonner'
+import type { ConnectedService } from '@/lib/services'
 
 interface ServiceAuthProps {
-  service: Service;
+  service: string
 }
 
 export function ServiceAuth({ service }: ServiceAuthProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // For button state during operation
-  const { mutate } = useSWRConfig(); // <-- Get the mutate function
+  const [isActive, setIsActive] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Effect to check initial connection status (remains the same)
   useEffect(() => {
-    // Consider adding loading/error state here too
-    fetch('/api/auth/me') // Assuming this endpoint correctly reflects linked accounts
+    fetch('/api/auth/me')
       .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch user status');
-          return res.json();
-       })
+        if (!res.ok) throw new Error('Failed to fetch user status')
+        return res.json()
+      })
       .then(data => {
-        const connectedServices = data.connected_services || [];
-        setIsActive(connectedServices.some((cs: Service) => cs.connection === SERVICES[service.provider].connection));
+        const connectedServices = data.connected_services || []
+        setIsActive(connectedServices.some((cs: ConnectedService) => 
+          cs.connection === SUPPORTED_SERVICES[service].connection
+        ))
       })
       .catch(err => {
-          console.error("Failed to check initial service status:", err)
-          // Optionally show a toast or error state
-       });
-  }, [service]); // Dependency array is correct
+        console.error("Failed to check initial service status:", err)
+      })
+  }, [service])
 
   const handleAuthClick = async () => {
-    setIsLoading(true); // Disable button, show loading state
+    setIsLoading(true)
 
     try {
-      // --- Popup Opening Logic (remains the same) ---
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
+      const width = 500
+      const height = 600
+      const left = window.screenX + (window.outerWidth - width) / 2
+      const top = window.screenY + (window.outerHeight - height) / 2
 
-      //window.location.href = `/api/auth/link?requested_connection=${SERVICE_CONFIGS[service].connection}`
       const popup = window.open(
-         // Ensure this URL matches your "start linking" API route
-        `/api/auth/link?requested_connection=${SERVICE_CONFIGS[service].connection}`,
+        `/api/auth/link?requested_connection=${SUPPORTED_SERVICES[service].connection}`,
         'Auth0 Login',
         `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
-      );
+      )
 
       if (!popup) {
-        throw new Error('Please enable popups for this site');
+        throw new Error('Please enable popups for this site')
       }
 
-      // --- Wait for Message from Popup (remains the same logic) ---
       await new Promise((resolve, reject) => {
         const messageHandler = (event: MessageEvent) => {
-          // IMPORTANT: Add origin check for security!
-          // if (event.origin !== window.location.origin) { // Or your specific allowed origin
-          //   console.warn('Message received from unexpected origin:', event.origin);
-          //   return;
-          // }
-
           if (event.data.type === 'AUTH_COMPLETE') {
-            console.log('AUTH_COMPLETE message received from popup.');
-            window.removeEventListener('message', messageHandler);
-            resolve(true);
+            window.removeEventListener('message', messageHandler)
+            resolve(true)
           } else if (event.data.type === 'AUTH_ERROR') {
-             console.log('AUTH_ERROR message received from popup.');
-            window.removeEventListener('message', messageHandler);
-            reject(new Error(event.data.error || 'Unknown error during authentication'));
+            window.removeEventListener('message', messageHandler)
+            reject(new Error(event.data.error || 'Unknown error during authentication'))
           }
-        };
-        window.addEventListener('message', messageHandler);
+        }
+        window.addEventListener('message', messageHandler)
 
-        // Optional: Add a check interval to see if popup was closed manually
         const intervalId = setInterval(() => {
-            if (popup.closed) {
-                clearInterval(intervalId);
-                window.removeEventListener('message', messageHandler);
-                // Don't automatically reject, maybe user just closed it
-                // Or reject if no success message was received yet:
-                // reject(new Error('Authentication popup closed by user.'));
-                console.log('Popup closed without completing auth message.');
-            }
-        }, 500); // Check every 500ms
-      });
+          if (popup.closed) {
+            clearInterval(intervalId)
+            window.removeEventListener('message', messageHandler)
+            console.log('Popup closed without completing auth message.')
+          }
+        }, 500)
+      })
 
-      // --- Session Refresh Logic (NEW) ---
-      toast.info('Authentication complete. Refreshing your session...'); // Give feedback
-      console.log('Auth complete message received. Refreshing session...');
+      toast.info('Authentication complete. Refreshing your session...')
+      console.log('Auth complete message received. Refreshing session...')
 
-      const refreshResponse = await fetch('/api/auth/update-session', { method: 'POST' });
-      const refreshData = await refreshResponse.json(); // Try parsing JSON always
+      const refreshResponse = await fetch('/api/auth/update-session', { method: 'POST' })
+      const refreshData = await refreshResponse.json()
 
       if (!refreshResponse.ok) {
-        // Use error message from API response if available
-        throw new Error(refreshData.error || `Failed to refresh session (${refreshResponse.status})`);
+        throw new Error(refreshData.error || `Failed to refresh session (${refreshResponse.status})`)
       }
 
-      console.log('Session update API call successful.');
-      await mutate('/api/auth/session'); // Revalidate useUser cache
-      await mutate('/api/auth/me'); // Revalidate TokenDisplay
-      console.log('Client-side user data revalidated.');
-      // --- End Session Refresh Logic ---
+      setIsActive(true)
+      toast.success(`Successfully connected to ${service}! Session updated.`)
 
-
-      // *** Important: Only update UI state *after* successful refresh ***
-      setIsActive(true);
-      toast.success(`Successfully connected to ${service}! Session updated.`);
-      
-    } catch (error: any) { // Catch errors from popup opening, message handling, or refresh
-      toast.error(`Failed to connect ${service}: ${error.message}`);
-      // Ensure UI reflects failure (isActive should remain false or be reset)
-      // setIsActive(false); // Reset if needed
+    } catch (error: any) {
+      toast.error(`Failed to connect ${service}: ${error.message}`)
     } finally {
-      setIsLoading(false); // Re-enable button, hide loading state
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="flex items-center gap-2 p-2">
       <span className="capitalize">{service}</span>
-      {/* Consider showing loading state instead of indicator */}
       {!isLoading && <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`} />}
-      {isLoading && <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Processing..."></span>} {/* Example Loading */}
+      {isLoading && <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Processing..."></span>}
 
       <Button variant={isActive ? 'secondary' : 'default'} onClick={handleAuthClick} disabled={isLoading}>
         {isLoading ? 'Processing...' : (isActive ? 'Re-authenticate' : 'Connect')}
       </Button>
     </div>
-  );
+  )
 }
