@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { auth0 } from '@/lib/auth0'
-
-import type { SupportedService } from '@/lib/services'
+import { Service } from '@/lib/services'
 
 /**
  * Middleware to handle authentication using Auth0
@@ -24,7 +23,7 @@ export async function middleware(request: NextRequest, response: NextResponse) {
       return NextResponse.redirect(`${origin}/auth/login`)
     }
 
-    const services: SupportedService[] = session.user?.connected_services || []
+    const services: Service[] = session.user?.connected_services || []
     
     services.forEach(async (service) => {
       // Refresh token if needed — it will be persisted
@@ -32,9 +31,7 @@ export async function middleware(request: NextRequest, response: NextResponse) {
         connection: service.connection,
       }
       await auth0.getAccessTokenForConnection(opts, request, response)
-      //if (service.connection === 'google-oauth2') {
-        console.log('Refreshing token for', service.connection)
-      //}
+      console.log('Refreshing token for', service.connection)
     })
     
   } catch (error) {
