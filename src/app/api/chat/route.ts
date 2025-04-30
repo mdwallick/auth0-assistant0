@@ -57,11 +57,11 @@ IMPORTANT: When using tools that create or modify data (like calendar events, fi
 3. Do not retry on failure
 4. Report the result to the user
 
-Use Microsoft calendar tools to check or create events in the user's Microsoft calendar.
-Use Microsoft file tools to examine files in the user's OneDrive.
-Use Google calendar tools to check or create events in the user's Google calendar.
-Use Google mail tools to read or send emails in the user's Google mailbox.
-Use Salesforce tools to query or create records in Salesforce.
+Use Salesforce tools (SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool) to interact with Salesforce records.
+Use Microsoft calendar tools only for calendar-related queries.
+Use Google calendar tools only for calendar-related queries.
+Use Microsoft file tools only for OneDrive file operations.
+Use Google mail tools only for Gmail operations.
 
 Render the email body as a markdown block. Do not wrap it in code blocks.
 `
