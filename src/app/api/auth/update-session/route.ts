@@ -79,7 +79,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Get latest user data from Management API
     const mgmtClient = new ManagementClient({
-      domain: process.env.AUTH0_DOMAIN!,
+      domain: process.env.AUTH0_API_DOMAIN!,
       clientId: process.env.AUTH0_CLIENT_ID!,
       clientSecret: process.env.AUTH0_CLIENT_SECRET!,
     });
