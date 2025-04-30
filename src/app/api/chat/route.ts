@@ -217,10 +217,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Refresh session to get latest connected services
-    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/auth/update-session`, {
+    await fetch(`${process.env.APP_BASE_URL || ''}/api/auth/update-session`, {
       method: 'POST',
       headers: {
-        cookie: request.headers.get('cookie') || '',
+        cookie: req.headers.get('cookie') || '',
       },
     })
 
@@ -244,9 +244,6 @@ export async function POST(req: NextRequest) {
       llm,
       tools,
       messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
-      config: {
-        recursionLimit: 50
-      }
     })
 
     const eventStream = await agent.streamEvents({ messages }, { version: 'v2' })
