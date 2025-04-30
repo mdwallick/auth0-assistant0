@@ -135,8 +135,9 @@ export async function POST(req: NextRequest) {
     // Get Microsoft token only if Microsoft services are enabled
     if (tools.some(tool => tool.name?.includes('Microsoft'))) {
       const accessToken = await getMicrosoftAccessToken()
-      const calendarTool = new MicrosoftCalendarReadTool(accessToken).getTool()
-      tools.push(calendarTool)
+      const calendarReadTool = new MicrosoftCalendarReadTool(accessToken).getTool()
+      const calendarWriteTool = new MicrosoftCalendarWriteTool(accessToken).getTool()
+      tools.push(calendarReadTool)
     }
 
     const llm = new ChatOpenAI({
