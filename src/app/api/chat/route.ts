@@ -216,6 +216,14 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Refresh session to get latest connected services
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/auth/update-session`, {
+      method: 'POST',
+      headers: {
+        cookie: request.headers.get('cookie') || '',
+      },
+    })
+
     const lastMessage = body.messages[body.messages.length - 1].content
     const intent = inferIntent(lastMessage)
     const tools = await getAvailableTools(intent)
