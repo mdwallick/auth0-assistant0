@@ -130,10 +130,14 @@ export async function POST(req: NextRequest) {
 
     //Infer intent from user message -  This is a placeholder and needs a more robust implementation
     const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
-    const accessToken = await getMicrosoftAccessToken()
+    const tools = await getAvailableTools(intent)
     
-    const calendarTool = new MicrosoftCalendarReadTool(accessToken).getTool()
-    const tools = [...await getAvailableTools(intent), calendarTool]
+    // Get Microsoft token only if Microsoft services are enabled
+    if (tools.some(tool => tool.name?.includes('Microsoft'))) {
+      const accessToken = await getMicrosoftAccessToken()
+      const calendarTool = new MicrosoftCalendarReadTool(accessToken).getTool()
+      tools.push(calendarTool)
+    }
 
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
