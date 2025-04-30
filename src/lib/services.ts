@@ -27,9 +27,9 @@ export const SERVICES = {
   }
 } as const;
 
-export type SupportedService = keyof typeof SERVICES;
+//export type SupportedService = keyof typeof SERVICES;
 
-export function getServiceFromConnection(connection: Service['connection']): SupportedService | undefined {
+export function getServiceFromConnection(connection: Service['connection']): Service | undefined {
   const entry = Object.entries(SERVICES).find(([_, config]) => config.connection === connection);
-  return entry ? entry[0] as SupportedService : undefined;
+  return entry ? entry[0] as Service : undefined;
 }

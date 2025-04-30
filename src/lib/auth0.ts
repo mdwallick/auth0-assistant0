@@ -1,9 +1,8 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
-import { SERVICE_CONFIGS, AUTH0_TO_SERVICE_MAP } from './services'
+import { getServiceFromConnection } from './services'
 import { ReplDBSessionStore } from './repl-db-session-store'
 
-import type { SupportedService } from './services'
-import type { Auth0Connection } from './services'
+import type { Service } from './services'
 
 const sessionStore = new ReplDBSessionStore()
 
@@ -45,7 +44,7 @@ export const auth0 = new Auth0Client({
   },
 })
 
-export async function getConnectedServices(): Promise<SupportedService[]> {
+export async function getConnectedServices(): Promise<Service[]> {
   const session = await auth0.getSession()
   if (!session) {
     throw new Error('Session not found')
@@ -53,18 +52,13 @@ export async function getConnectedServices(): Promise<SupportedService[]> {
 
   const connectedServices = session.user?.connected_services || []
   return connectedServices
-    .map((cs) => getServiceFromConnection(cs.connection))
-    .filter((service): service is SupportedService => service !== undefined)
+    .map((cs: Service) => getServiceFromConnection(cs.connection))
+    .filter((service: Service) => service !== undefined)
 }
 
-export async function getAccessToken(service: SupportedService): Promise<string> {
-  const config = SERVICE_CONFIGS[service]
-  if (!config) {
-    throw new Error(`Unsupported service: ${service}`)
-  }
-
+export async function getAccessToken(service: string): Promise<string> {
   const { token } = await auth0.getAccessTokenForConnection({
-    connection: config.connection,
+    connection: service,
   })
 
   return token

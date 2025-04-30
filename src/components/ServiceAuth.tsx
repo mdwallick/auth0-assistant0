@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useSWRConfig } from 'swr'; // <-- Import useSWRConfig
 import { Button } from '@/components/ui/button';
-import { SERVICE_CONFIGS } from '@/lib/services';
+import { SERVICES } from '@/lib/services';
 import { toast } from 'sonner';
-import type { SupportedService } from '@/lib/services';
+import type { Service } from '@/lib/services';
 
 interface ServiceAuthProps {
-  service: SupportedService;
+  service: Service;
 }
 
 export function ServiceAuth({ service }: ServiceAuthProps) {
@@ -26,7 +26,7 @@ export function ServiceAuth({ service }: ServiceAuthProps) {
        })
       .then(data => {
         const connectedServices = data.connected_services || [];
-        setIsActive(connectedServices.some((cs: any) => cs.connection === SERVICE_CONFIGS[service].connection));
+        setIsActive(connectedServices.some((cs: Service) => cs.connection === SERVICES[service.provider].connection));
       })
       .catch(err => {
           console.error("Failed to check initial service status:", err)
