@@ -4,8 +4,7 @@ import { auth0 } from '@/lib/auth0'
 import { getServiceFromConnection, SUPPORTED_SERVICES, type SupportedService } from '@/lib/services'
 
 const inputSchema = z.object({
-  input: z.string().nullish(),
-  skipStatusCheck: z.boolean().nullish().default(false)
+  input: z.string().nullish()
 })
 
 export class ServiceStatusTool {
