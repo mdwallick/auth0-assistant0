@@ -5,7 +5,7 @@ import { Connection } from 'jsforce'
 
 const searchSchema = z.object({
   searchTerm: z.string().describe('The search term to look for'),
-  scope: z.array(z.string()).optional().describe('Optional array of object types to search within'),
+  scope: z.array(z.string()).optional().nullable().describe('Optional array of object types to search within'),
 })
 
 export class SalesforceSearchTool {
