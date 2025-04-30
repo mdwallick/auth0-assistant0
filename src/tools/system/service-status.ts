@@ -2,7 +2,7 @@
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { auth0 } from '@/lib/auth0'
-import { getServiceFromConnection } from '@/lib/services'
+import { getServiceFromConnection, type SupportedService } from '@/lib/services'
 
 const inputSchema = z.object({
   input: z.string().nullish(),
@@ -28,9 +28,9 @@ export class ServiceStatusTool {
           const connectedServices = session?.user?.connected_services || []
           const activeServices = connectedServices
             .map(cs => getServiceFromConnection(cs.connection))
-            .filter((service): service is string => service !== undefined)
+            .filter((service): service is SupportedService => service !== undefined)
 
-          const allServices = ['microsoft', 'salesforce', 'google']
+          const allServices: SupportedService[] = ['microsoft', 'salesforce', 'google']
           
           return JSON.stringify({
             activeServices,
