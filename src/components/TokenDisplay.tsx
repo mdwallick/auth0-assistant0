@@ -1,15 +1,35 @@
+
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function TokenDisplay() {
   const { data: session, error, mutate } = useSWR('/api/auth/me', fetcher, {
-    refreshInterval: 0,
-    revalidateOnFocus: false
+    refreshInterval: 5000, // Poll every 5 seconds
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true
   })
+
+  // Refresh session when window receives focus
+  useEffect(() => {
+    const handleFocus = () => {
+      mutate()
+    }
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [mutate])
+
+  // Listen for custom session update events
+  useEffect(() => {
+    const handleSessionUpdate = () => {
+      mutate()
+    }
+    window.addEventListener('session-updated', handleSessionUpdate)
+    return () => window.removeEventListener('session-updated', handleSessionUpdate)
+  }, [mutate])
 
   if (error) {
     return (

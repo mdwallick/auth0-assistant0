@@ -112,10 +112,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     console.log('User session updated successfully for sub:', newSession.user.sub);
     // Return only necessary/safe user info back to client if needed
     const { sub, name, email, picture } = newSession.user;
-    return NextResponse.json(
-      { message: 'Session updated successfully', user: { sub, name, email, picture } }, // Return subset of user info
-      { status: 200 }
-    );
+    const response = NextResponse.json({ 
+      message: 'Session updated successfully', 
+      sub: newSession.user.sub,
+      session: await auth0.getSession()
+    })
+
+    return response;
 
   } catch (error: unknown) {
     let errorMessage = 'Failed to update session';
