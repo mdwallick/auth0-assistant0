@@ -69,7 +69,7 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 const getAvailableTools = async (intent?: string) => {
   const tools: ToolInterface[] = [ServiceStatusTool]
   const activeServices = await getConnectedServices()
-  
+
   // Get Microsoft token if needed
   let microsoftToken: string | undefined
   if (activeServices.includes('microsoft')) {
@@ -87,7 +87,7 @@ const getAvailableTools = async (intent?: string) => {
     accessToken: await getAccessToken('salesforce-dev'),
   })
 
-  
+
   // Build tool list based on active services and intent
   const selectedTools = []
 
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     //Infer intent from user message -  This is a placeholder and needs a more robust implementation
     const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
     const tools = await getAvailableTools(intent)
-    
+
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
       temperature: 0,
@@ -182,6 +182,9 @@ export async function POST(req: NextRequest) {
       llm,
       tools,
       messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
+      config: {
+        recursionLimit: 50
+      }
     })
 
     const eventStream = await agent.streamEvents({ messages }, { version: 'v2' })
