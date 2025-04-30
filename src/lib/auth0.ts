@@ -52,10 +52,8 @@ export async function getConnectedServices(): Promise<SupportedService[]> {
   }
 
   const connectedServices = session.user?.connected_services || []
-  const auth0Connections = connectedServices.map((cs) => cs.connection)
-
-  return auth0Connections
-    .map((connection) => AUTH0_TO_SERVICE_MAP[connection as Auth0Connection])
+  return connectedServices
+    .map((cs) => getServiceFromConnection(cs.connection))
     .filter((service): service is SupportedService => service !== undefined)
 }
 
