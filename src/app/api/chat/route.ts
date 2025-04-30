@@ -8,6 +8,7 @@ import { LangChainTracer } from 'langchain/callbacks'
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters'
 import { logToolCallsInDevelopment } from '@/utils/stream-logging'
 import { getAccessToken, getConnectedServices } from '@/lib/auth0'
+import { google } from 'googleapis'
 
 // import general tools
 import ServiceStatusTool from '@/tools/system/service-status'
@@ -71,6 +72,13 @@ const getAvailableTools = async (intent?: string) => {
   let microsoftToken: string | undefined
   if (activeServices.includes('microsoft')) {
     microsoftToken = await getAccessToken('windowslive')
+  }
+
+  let googleClient;
+  if (activeServices.includes('google')) {
+    const token = await getAccessToken('google-oauth2')
+    const googleClient = new google.auth.OAuth2()
+    googleClient.setCredentials({ access_token: token })
   }
   
   // Build tool list based on active services and intent

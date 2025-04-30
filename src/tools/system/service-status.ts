@@ -19,7 +19,7 @@ export class ServiceStatusTool {
           const connectedServices = session?.user?.connected_services || []
           const activeServices = connectedServices
             .map(cs => getServiceFromConnection(cs.connection))
-            .filter((service): service is keyof typeof SUPPORTED_SERVICES => service !== undefined)
+            .filter((service): service is SupportedService => service !== undefined)
 
           const allServices = Object.keys(SUPPORTED_SERVICES)
 
