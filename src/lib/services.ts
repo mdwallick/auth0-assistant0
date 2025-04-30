@@ -1,12 +1,19 @@
 
-export interface Service {
-  connection: 'windowslive' | 'google-oauth2' | 'salesforce-dev';
+export interface ConnectedService {
+  connection: string;
   isSocial: boolean;
-  provider: 'microsoft' | 'google' | 'salesforce';
+  provider: string;
   user_id: string;
 }
 
-export const SERVICES = {
+export interface SupportedService {
+  connection: string;
+  isSocial: boolean; 
+  provider: string;
+  scope: string;
+}
+
+export const SUPPORTED_SERVICES: Record<string, SupportedService> = {
   microsoft: {
     connection: 'windowslive',
     isSocial: true,
@@ -27,9 +34,7 @@ export const SERVICES = {
   }
 } as const;
 
-//export type SupportedService = keyof typeof SERVICES;
-
-export function getServiceFromConnection(connection: Service['connection']): Service | undefined {
-  const entry = Object.entries(SERVICES).find(([_, config]) => config.connection === connection);
-  return entry ? entry[0] as Service : undefined;
+export function getServiceFromConnection(connection: string): string | undefined {
+  const entry = Object.entries(SUPPORTED_SERVICES).find(([_, config]) => config.connection === connection);
+  return entry ? entry[0] : undefined;
 }
