@@ -8,19 +8,9 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function TokenDisplay() {
   const { data: session, error, mutate } = useSWR('/api/auth/me', fetcher, {
-    refreshInterval: 5000, // Poll every 5 seconds
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
-
-  // Refresh session when window receives focus
-  useEffect(() => {
-    const handleFocus = () => {
-      mutate()
-    }
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
-  }, [mutate])
 
   // Listen for custom session update events
   useEffect(() => {
