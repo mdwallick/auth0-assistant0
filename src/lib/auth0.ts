@@ -13,22 +13,16 @@ export const auth0 = new Auth0Client({
   appBaseUrl: process.env.APP_BASE_URL!,
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
+  scopes: process.env.AUTH0_SCOPES!,
 
-  // session: {
-  //   store: new ReplDBSessionStore(),
-  // },
-  
   sessionStore: {
     async get(id) {
-      // query and return a session by its ID
       return await sessionStore.get(id)
     },
     async set(id, sessionData) {
-      // upsert the session given its ID and sessionData
       await sessionStore.set(id, sessionData)
     },
     async delete(id) {
-      // delete the session using its ID
       await sessionStore.delete(id)
     },
     // async deleteByLogoutToken({ sid, sub }: { sid: string; sub: string }) {
@@ -36,13 +30,8 @@ export const auth0 = new Auth0Client({
     // },
   },
 
-  // authorizationParameters: {
-  //   scope: "openid profile email update:current_user_identities",
-  // },
-
   async beforeSessionSaved(session, idToken) {
     const decoded_jwt = decodeJwt(idToken)
-    console.log(decoded_jwt)
     return {
       ...session,
       user: {

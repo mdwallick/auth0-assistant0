@@ -1,22 +1,21 @@
-import './globals.css';
-import { Roboto_Mono, Inter } from 'next/font/google';
-import Image from 'next/image';
-//import { LogOut } from 'lucide-react';
+import './globals.css'
+import { Roboto_Mono, Inter } from 'next/font/google'
+import Image from 'next/image'
 
-import { ActiveLink, Navbar } from '@/components/Navbar';
-//import { Button } from '@/components/ui/button';
-import { Toaster } from '@/components/ui/sonner';
-import { auth0 } from '@/lib/auth0';
+import { ClientAuthProvider } from '@/components/ClientAuthProvider'
+import { ActiveLink, Navbar } from '@/components/Navbar'
+import { Toaster } from '@/components/ui/sonner'
+import { auth0 } from '@/lib/auth0'
 import { TokenDisplay } from '@/components/TokenDisplay'
 
-const robotoMono = Roboto_Mono({ weight: '400', subsets: ['latin'] });
-const publicSans = Inter({ weight: '400', subsets: ['latin'] });
+const robotoMono = Roboto_Mono({ weight: '400', subsets: ['latin'] })
+const publicSans = Inter({ weight: '400', subsets: ['latin'] })
 
-const TITLE = 'Auth0 Assistant0: An Auth0 + LangChain + Next.js Template';
-const DESCRIPTION = 'Starter template showing how to use Auth0 in LangChain + Next.js projects.';
+const TITLE = 'Auth0 Assistant0: An Auth0 + LangChain + Next.js Template'
+const DESCRIPTION = 'Starter template showing how to use Auth0 in LangChain + Next.js projects.'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth0.getSession();
+  const session = await auth0.getSession()
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -33,6 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="twitter:image" content="/images/og-image.png" />
       </head>
       <body className={publicSans.className}>
+        <ClientAuthProvider>
         <div className="bg-secondary grid grid-rows-[auto,auto,1fr] h-[100dvh]">
           <div className="grid grid-cols-[1fr,auto] gap-2 p-4 bg-black/25">
             <div className="flex gap-4 flex-col md:flex-row md:items-center">
@@ -45,7 +45,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="flex justify-center">
             </div>
           </div>
-          <Navbar />
+          {session && (
+            <Navbar />
+          )}
           <div className="grid grid-cols-[1fr,400px] h-[calc(100vh-8rem)]">
             <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
               <div className="absolute inset-0">{children}</div>
@@ -58,7 +60,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </div>
         <Toaster />
+        </ClientAuthProvider>
       </body>
     </html>
-  );
+  )
 }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Authentication...</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .message {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <div class="spinner"></div>
+        <p>Completing authentication process...</p>
+        <p><small>This window will close automatically.</small></p>
+    </div>
+
+    <script>
+        (function() {
+            let messageSent = false; // Flag to prevent multiple messages
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const status = params.get('status');
+                const errorMessage = params.get('message'); // Will be URL encoded
+
+                // IMPORTANT: Set the correct origin for your main application window
+                // Using window.location.origin is usually safe if the app and API routes
+                // share the same origin. If not, specify the exact origin.
+                const targetOrigin = window.location.origin;
+
+                if (window.opener && !window.opener.closed) {
+                    console.log('Opener window found. Status:', status);
+
+                    if (status === 'success') {
+                        console.log('Sending AUTH_COMPLETE message to opener.');
+                        window.opener.postMessage({ type: 'AUTH_COMPLETE' }, targetOrigin);
+                        messageSent = true;
+                    } else {
+                        // Default error message if none provided
+                        const decodedError = decodeURIComponent(errorMessage || 'An unknown error occurred.');
+                        console.log('Sending AUTH_ERROR message to opener:', decodedError);
+                        window.opener.postMessage({ type: 'AUTH_ERROR', error: decodedError }, targetOrigin);
+                        messageSent = true;
+                    }
+                } else {
+                    console.warn('Opener window was not found or has been closed.');
+                    // Update the UI for the user in the popup if opener is gone
+                     const messageDiv = document.querySelector('.message');
+                     if(messageDiv) {
+                         messageDiv.innerHTML = '<p>Authentication processed. Please close this window.</p>';
+                     }
+                }
+            } catch (e) {
+                console.error("Error processing callback page and sending message:", e);
+                 // Attempt to send a generic error message if something failed catastrophically
+                 if (window.opener && !window.opener.closed && !messageSent) {
+                     try {
+                         window.opener.postMessage({ type: 'AUTH_ERROR', error: 'Callback processing failed.' }, window.location.origin);
+                     } catch (postErr) {
+                          console.error("Failed to post final error message:", postErr);
+                     }
+                 }
+            } finally {
+                // Close the popup window automatically after attempting to send the message
+                // A slight delay can sometimes help ensure the message is dispatched
+                console.log('Closing popup window.');
+                setTimeout(() => window.close(), 2000); // Close after 200ms
+            }
+        })();
+    </script>
+</body>
+</html>

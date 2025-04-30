@@ -8,7 +8,3 @@ export async function getGoogleClient() {
   oauth2Client.setCredentials({ access_token: token })
   return oauth2Client
 }
-
-export async function getGoogleAccessToken(): Promise<string> {
-  return await getAccessToken('google')
-}
