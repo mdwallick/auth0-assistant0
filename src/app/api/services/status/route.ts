@@ -1,5 +1,5 @@
-import { getConnectedServices } from '@/lib/auth0'
 import { NextResponse } from 'next/server'
+import { getConnectedServices } from '@/lib/auth0'
 
 export async function GET() {
   const activeServices = await getConnectedServices()

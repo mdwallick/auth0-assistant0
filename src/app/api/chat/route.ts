@@ -7,7 +7,7 @@ import { SystemMessage } from '@langchain/core/messages'
 import { LangChainTracer } from 'langchain/callbacks'
 import { convertVercelMessageToLangChainMessage } from '@/utils/message-converters'
 import { logToolCallsInDevelopment } from '@/utils/stream-logging'
-import { getConnectedServices } from '@/lib/auth0'
+import { getAccessToken, getConnectedServices } from '@/lib/auth0'
 
 // import general tools
 import { ServiceStatusTool } from '@/tools/system/service-status'
@@ -33,7 +33,6 @@ import {
   MicrosoftFilesWriteTool,
   MicrosoftFilesListTool,
 } from '@/tools/microsoft'
-import { getMicrosoftAccessToken } from '@/tools/microsoft/auth'
 
 // import Salesforce tools
 import { SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool } from '@/tools/salesforce'
@@ -71,7 +70,7 @@ const getAvailableTools = async (intent?: string) => {
   // Get Microsoft token if needed
   let microsoftToken: string | undefined
   if (activeServices.includes('microsoft')) {
-    microsoftToken = await getMicrosoftAccessToken()
+    microsoftToken = await getAccessToken('windowslive')
   }
   
   // Build tool list based on active services and intent
@@ -138,14 +137,6 @@ export async function POST(req: NextRequest) {
     const intent = body.messages[body.messages.length -1].content.toLowerCase().includes('onedrive') ? 'files' : undefined;
     const tools = await getAvailableTools(intent)
     
-    // Get Microsoft token only if Microsoft services are enabled
-    if (tools.some(tool => tool.name?.includes('Microsoft'))) {
-      const accessToken = await getMicrosoftAccessToken()
-      const calendarReadTool = new MicrosoftCalendarReadTool(accessToken).getTool()
-      const calendarWriteTool = new MicrosoftCalendarWriteTool(accessToken).getTool()
-      tools.push(calendarReadTool)
-    }
-
     const llm = new ChatOpenAI({
       modelName: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
       temperature: 0,
