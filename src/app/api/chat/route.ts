@@ -67,51 +67,57 @@ Render the email body as a markdown block. Do not wrap it in code blocks.
 const getAvailableTools = async (intent?: string) => {
   const tools: ToolInterface[] = [ServiceStatusTool]
   const activeServices = await getConnectedServices()
-
-  // Only load specific tools based on intent or context
+  
+  // Get Microsoft token if needed
+  let microsoftToken: string | undefined
   if (activeServices.includes('microsoft')) {
+    microsoftToken = await getMicrosoftAccessToken()
+  }
+  
+  // Build tool list based on active services and intent
+  const selectedTools = []
+
+  if (microsoftToken) {
     const microsoftTools = {
-      files: [MicrosoftFilesListTool, MicrosoftFilesReadTool, MicrosoftFilesWriteTool],
-      calendar: [MicrosoftCalendarReadTool, MicrosoftCalendarWriteTool],
-      mail: [MicrosoftMailReadTool, MicrosoftMailWriteTool]
+      files: [
+        new MicrosoftFilesListTool(microsoftToken).getTool(),
+        new MicrosoftFilesReadTool(microsoftToken).getTool(),
+        new MicrosoftFilesWriteTool(microsoftToken).getTool()
+      ],
+      calendar: [
+        new MicrosoftCalendarReadTool(microsoftToken).getTool(),
+        new MicrosoftCalendarWriteTool(microsoftToken).getTool()
+      ],
+      mail: [
+        new MicrosoftMailReadTool(microsoftToken).getTool(),
+        new MicrosoftMailWriteTool(microsoftToken).getTool()
+      ]
     }
 
-    if (intent === 'files') {
-      tools.push(...microsoftTools.files)
-    } else if (intent === 'calendar') {
-      tools.push(...microsoftTools.calendar)
-    } else if (intent === 'mail') {
-      tools.push(...microsoftTools.mail)
-    } else {
-      // If no specific intent, load all Microsoft tools
-      tools.push(...[...microsoftTools.files, ...microsoftTools.calendar, ...microsoftTools.mail])
-    }
+    if (intent === 'files') selectedTools.push(...microsoftTools.files)
+    else if (intent === 'calendar') selectedTools.push(...microsoftTools.calendar)
+    else if (intent === 'mail') selectedTools.push(...microsoftTools.mail)
+    else selectedTools.push(...Object.values(microsoftTools).flat())
   }
 
   if (activeServices.includes('salesforce') && intent === 'salesforce') {
-    tools.push(SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool)
+    selectedTools.push(SalesforceQueryTool, SalesforceCreateTool, SalesforceSearchTool)
   }
 
   if (activeServices.includes('google')) {
-
     const googleTools = {
       mail: [GoogleMailReadTool, GoogleMailWriteTool],
       calendar: [GoogleCalendarReadTool, GoogleCalendarWriteTool],
       files: [GoogleDriveListTool, GoogleDriveReadTool, GoogleDriveWriteTool]
-    };
-
-    if (intent === 'mail') {
-      tools.push(...googleTools.mail)
-    } else if (intent === 'calendar') {
-      tools.push(...googleTools.calendar)
-    } else if (intent === 'files') {
-      tools.push(...googleTools.files)
-    } else {
-      tools.push(...Object.values(googleTools).flat())
     }
+
+    if (intent === 'mail') selectedTools.push(...googleTools.mail)
+    else if (intent === 'calendar') selectedTools.push(...googleTools.calendar)
+    else if (intent === 'files') selectedTools.push(...googleTools.files)
+    else selectedTools.push(...Object.values(googleTools).flat())
   }
 
-  return tools
+  return [...tools, ...selectedTools]
 }
 
 export async function POST(req: NextRequest) {
