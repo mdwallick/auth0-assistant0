@@ -87,7 +87,6 @@ const getAvailableTools = async (intent?: string) => {
     accessToken: await getAccessToken('salesforce-dev'),
   })
 
-
   // Build tool list based on active services and intent
   const selectedTools = []
 
