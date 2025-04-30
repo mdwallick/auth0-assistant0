@@ -1,4 +1,3 @@
-
 import { tool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { auth0 } from '@/lib/auth0'
@@ -30,11 +29,11 @@ export class ServiceStatusTool {
             .map(cs => getServiceFromConnection(cs.connection))
             .filter((service): service is SupportedService => service !== undefined)
 
-          //const allServices: SupportedService[] = ['microsoft', 'salesforce', 'google']
-          
+          const allServices = Object.keys(SUPPORTED_SERVICES)
+
           return JSON.stringify({
             activeServices,
-            status: SUPPORTED_SERVICES.map(service => ({
+            status: allServices.map(service => ({
               service,
               status: activeServices.includes(service) ? '✅' : '❌',
               active: activeServices.includes(service)
