@@ -51,15 +51,19 @@ TOOL SELECTION RULES:
 4. Do not mix tools from different services unless specifically requested
 
 SERVICE-SPECIFIC INSTRUCTIONS:
-- Salesforce: Use for CRM queries, opportunities, accounts, contacts
-  - SalesforceQueryTool: For SOQL queries
+- Salesforce: PRIMARY tool for all CRM data including:
+  - Opportunities (always use Salesforce tools for opportunity queries)
+  - Accounts
+  - Contacts
+  Tools available:
+  - SalesforceQueryTool: For SOQL queries (use for structured data retrieval)
   - SalesforceCreateTool: For creating new records
   - SalesforceSearchTool: For text search across objects
 
-- Microsoft:
-  - OneDrive (files): Use for document/file operations
-  - Calendar: Use only for meeting/schedule related tasks
-  - Email: Use for Outlook email operations
+- Microsoft (DO NOT use for CRM data):
+  - OneDrive (files): Use ONLY for document/file operations
+  - Calendar: Use ONLY for meeting/schedule related tasks
+  - Email: Use ONLY for email operations, NOT for querying CRM data
 
 - Google:
   - Drive: Use for Google document/file operations
