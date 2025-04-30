@@ -13,7 +13,7 @@ export const auth0 = new Auth0Client({
   clientId: process.env.AUTH0_CLIENT_ID!,
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
   authorizationParameters: {
-    scope: process.env.AUTH0_SCOPES || "openid profile email",
+    scope: process.env.AUTH0_SCOPES || "openid profile email offline_access",
     connection: process.env.AUTH0_CONNECTION_NAME || "Username-Password-Authentication",
   },
 
