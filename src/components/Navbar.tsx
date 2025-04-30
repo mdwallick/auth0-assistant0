@@ -64,10 +64,24 @@ export function Navbar() {
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={clearChat}>
-          New Chat
-        </Button>
-        {/* You could add other nav links here */}
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={clearChat}>
+            New Chat
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={async () => {
+              try {
+                await fetch('/api/auth/update-session', { method: 'POST' });
+                window.dispatchEvent(new Event('session-updated'));
+              } catch (error) {
+                console.error('Failed to refresh session:', error);
+              }
+            }}
+          >
+            Refresh Session
+          </Button>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         {/* Conditional rendering based on the user object from the hook */}
