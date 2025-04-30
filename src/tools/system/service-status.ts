@@ -33,7 +33,7 @@ export class ServiceStatusTool {
 
           return JSON.stringify({
             activeServices,
-            status: allServices.map((service: SupportedService) => ({
+            status: allServices.map(service => ({
               service,
               status: activeServices.includes(service) ? '✅' : '❌',
               active: activeServices.includes(service)
