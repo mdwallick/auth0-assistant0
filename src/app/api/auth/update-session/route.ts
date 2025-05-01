@@ -84,12 +84,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       clientSecret: process.env.AUTH0_CLIENT_SECRET!,
     });
 
-    const latestUserInfo = await mgmtClient.users.get({ id: session.user.sub });
+    const latestUserInfo = await (await mgmtClient.users.get({ id: session.user.sub })).data
 
+    console.log('Latest user info:', latestUserInfo)
+    
     // Ensure 'sub' matches - important safety check
     if(latestUserInfo.user_id !== session.user.sub) {
-        console.error('User info sub mismatch during session update. Aborting.');
-        throw new Error('User identity mismatch during session update.');
+        console.error('User info sub mismatch during session update. Aborting.')
+        throw new Error('User identity mismatch during session update.')
     }
 
     // 4. Create the new session data
