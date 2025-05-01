@@ -80,7 +80,10 @@ Render email bodies as markdown blocks without code block wrapping.
 //const msftParams = getAccessToken()
 //console.log('🔑 access token 🔑', msftParams)
 
+import { IdentityInspectorTool } from '@/tools/system/identity-inspector'
+
 const tools = [
+  IdentityInspectorTool,
   MicrosoftCalendarReadTool,
   // withMicrosoftConnection(new MicrosoftCalendarWriteTool(msftParams).getTool()),
   // withMicrosoftConnection(new MicrosoftFilesListTool(msftParams).getTool()),
