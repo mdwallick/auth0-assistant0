@@ -17,19 +17,27 @@ export class ServiceStatusTool {
         try {
           const session = await auth0.getSession()
           const connectedServices = session?.user?.connected_services || []
-          const activeServices = connectedServices
-            .map(cs => getServiceFromConnection(cs.connection))
-            .filter((service): service is SupportedService => service !== undefined)
-
           const allServices = Object.keys(SUPPORTED_SERVICES)
+          
+          const statusChecks = await Promise.all(
+            allServices.map(async (service) => {
+              try {
+                const connection = SUPPORTED_SERVICES[service].connection
+                await auth0.getAccessTokenForConnection({ connection })
+                return { service, active: true, status: '✅' }
+              } catch (error) {
+                return { service, active: false, status: '❌' }
+              }
+            })
+          )
+
+          const activeServices = statusChecks
+            .filter(check => check.active)
+            .map(check => check.service)
 
           return JSON.stringify({
             activeServices,
-            status: allServices.map(service => ({
-              service,
-              status: activeServices.includes(service) ? '✅' : '❌',
-              active: activeServices.includes(service)
-            }))
+            status: statusChecks
           })
         } catch (error) {
           return JSON.stringify({
