@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { auth0 } from '@/lib/auth0'
-//import { ConnectedService } from '@/lib/services'
 
 /**
  * Middleware to handle authentication using Auth0
@@ -14,28 +13,10 @@ export async function middleware(request: NextRequest) {
   }
 
   const { origin } = new URL(request.url)
-  try {
-    const session = await auth0.getSession()
-    
-    // user does not have a session — redirect to login
-    if (!session) {
-      console.log('No session found, redirecting to login')
-      return NextResponse.redirect(`${origin}/auth/login`)
-    }
+  const session = await auth0.getSession()
 
-    // const services: ConnectedService[] = session.user?.connected_services || []
-    
-    // services.forEach(async (service) => {
-    //   // Refresh token if needed — it will be persisted
-    //   const opts = {
-    //     connection: service.connection,
-    //   }
-    //   await auth0.getAccessTokenForConnection(opts, request, response)
-    //   console.log('Refreshing token for', service.connection)
-    // })
-    
-  } catch (error) {
-    console.error('Auth0 session error:', error)
+  // user does not have a session — redirect to login
+  if (!session) {
     return NextResponse.redirect(`${origin}/auth/login`)
   }
 

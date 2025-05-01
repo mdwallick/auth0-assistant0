@@ -1,8 +1,5 @@
 import { Auth0Client } from '@auth0/nextjs-auth0/server'
-import { getServiceFromConnection } from './services'
 import { ReplDBSessionStore } from './repl-db-session-store'
-
-import type { ConnectedService } from './services'
 
 const sessionStore = new ReplDBSessionStore()
 
@@ -32,69 +29,44 @@ export const auth0 = new Auth0Client({
     // },
   },
 
-  async beforeSessionSaved(session, idToken) {
-    const decoded_jwt = decodeJwt(idToken)
-    return {
-      ...session,
-      user: {
-        ...session.user,
-        connected_services: decoded_jwt?.connected_services || []
-      },
-    }
-  },
+  // async beforeSessionSaved(session, idToken) {
+  //   const decoded_jwt = decodeJwt(idToken) 
+  //   return {
+  //     ...session,
+  //     user: {
+  //       ...session.user,
+  //       connected_services: decoded_jwt?.connected_services || []
+  //     },
+  //   }
+  // },
 })
 
-export async function getConnectedServices(): Promise<ConnectedService[]> {
+// Get the refresh token from Auth0 session
+export const getRefreshToken = async () => {
   const session = await auth0.getSession()
-  if (!session) {
-    throw new Error('Session not found')
-  }
-
-  const connectedServices = session.user?.connected_services || []
-  return connectedServices
-    .map((cs: ConnectedService) => getServiceFromConnection(cs.connection))
-    .filter((service: ConnectedService) => service !== undefined)
+  return session?.tokenSet?.refreshToken
 }
 
-// Cache object to store tokens with their expiry
-const tokenCache: Record<string, { token: string; expiresAt: number }> = {}
-
-export async function getAccessToken(service: string): Promise<string> {
-  const now = Date.now()
-  
-  // Check cache first
-  if (tokenCache[service] && tokenCache[service].expiresAt > now) {
-    return tokenCache[service].token
-  }
-
+export async function getAccessToken(connection: string): Promise<string> {
   try {
-    const { token, expiresIn = 3600 } = await auth0.getAccessTokenForConnection({
-      connection: service,
+    const token = await auth0.getAccessTokenForConnection({
+      connection: connection,
     })
-
-    // Cache the token with expiry
-    tokenCache[service] = {
-      token,
-      expiresAt: now + (expiresIn * 1000) - 300000 // Expire 5 minutes early
-    }
-
     return token
   } catch (error: any) {
-    if (error.code === 'user_not_found') {
-      return '' // Return empty string for non-connected services
-    }
-    throw error
+      // Return empty string for non-connected services
+    return ''
   }
 }
 
-function decodeJwt(token: string | null) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const json = atob(base64);
-    return JSON.parse(json);
-  } catch (err) {
-    return null;
-  }
-}
+// function decodeJwt(token: string | null) {
+//   if (!token) return null;
+//   try {
+//     const payload = token.split('.')[1];
+//     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+//     const json = atob(base64);
+//     return JSON.parse(json);
+//   } catch (err) {
+//     return null;
+//   }
+// }
