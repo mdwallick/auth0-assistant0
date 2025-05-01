@@ -56,12 +56,35 @@ export async function getConnectedServices(): Promise<ConnectedService[]> {
     .filter((service: ConnectedService) => service !== undefined)
 }
 
-export async function getAccessToken(service: string): Promise<string> {
-  const { token } = await auth0.getAccessTokenForConnection({
-    connection: service,
-  })
+// Cache object to store tokens with their expiry
+const tokenCache: Record<string, { token: string; expiresAt: number }> = {}
 
-  return token
+export async function getAccessToken(service: string): Promise<string> {
+  const now = Date.now()
+  
+  // Check cache first
+  if (tokenCache[service] && tokenCache[service].expiresAt > now) {
+    return tokenCache[service].token
+  }
+
+  try {
+    const { token, expiresIn = 3600 } = await auth0.getAccessTokenForConnection({
+      connection: service,
+    })
+
+    // Cache the token with expiry
+    tokenCache[service] = {
+      token,
+      expiresAt: now + (expiresIn * 1000) - 300000 // Expire 5 minutes early
+    }
+
+    return token
+  } catch (error: any) {
+    if (error.code === 'user_not_found') {
+      return '' // Return empty string for non-connected services
+    }
+    throw error
+  }
 }
 
 function decodeJwt(token: string | null) {
