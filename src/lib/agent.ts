@@ -104,20 +104,17 @@ const llm = new ChatOpenAI({
   modelName: process.env.OPENAI_MODEL || 'gpt-4o',
   temperature: 0,
 })
-  .bind({
-    tools: tools,
-  })
-  .withConfig({
-    tags: ['chat-api'],
-    callbacks: tracer ? [tracer] : undefined,
-  })
+  // .bind({
+  //   tools,
+  // })
+  // .withConfig({
+  //   tags: ['chat-api'],
+  //   callbacks: tracer ? [tracer] : undefined,
+  // })
 
 export const agent = createReactAgent({
   llm,
-  tools: new ToolNode(tools, {
-    // Error handler must be disabled in order to trigger interruptions from within tools.
-    handleToolErrors: false,
-  }),
+  tools,
   prompt: AGENT_SYSTEM_TEMPLATE,
   //messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
 })
