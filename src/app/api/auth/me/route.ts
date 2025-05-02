@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   // Map the identities to ConnectedService type
-  const mappedIdentities: ConnectedService[] = session.user.identities?.map(identity => ({
+  const mappedIdentities: ConnectedService[] = session.user.identities?.map((identity: ConnectedService) => ({
     name: mapConnectionToName(identity.connection),
     provider: identity.provider,
     user_id: identity.user_id,
