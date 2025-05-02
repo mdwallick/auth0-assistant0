@@ -12,7 +12,7 @@ export async function GET() {
 
   // Map the identities to ConnectedService type
   const mappedIdentities: ConnectedService[] = session.user.identities?.map(identity => ({
-    name: identity.name || '',
+    name: mapConnectionToName(identity.connection),
     provider: identity.provider,
     user_id: identity.user_id,
     connection: identity.connection,
@@ -25,4 +25,22 @@ export async function GET() {
   }
   
   return NextResponse.json(response)
+}
+
+function mapConnectionToName(connection: string) {
+  let name = ''
+  switch(connection) {
+    case "windowslive":
+      name = "Microsoft"
+      break
+    case "google-oauth2":
+      name = "Google"
+      break
+    case "salesforce-dev":
+      name = "Salesforce"
+      break
+    default:
+      name = "service not implemented"
+  }
+  return name
 }

@@ -68,19 +68,6 @@ export function Navbar() {
           <Button variant="outline" onClick={clearChat}>
             New Chat
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={async () => {
-              try {
-                await fetch('/api/auth/update-session', { method: 'POST' });
-                window.dispatchEvent(new Event('session-updated'));
-              } catch (error) {
-                console.error('Failed to refresh session:', error);
-              }
-            }}
-          >
-            Refresh Session
-          </Button>
         </div>
       </div>
       <div className="flex items-center gap-4">
