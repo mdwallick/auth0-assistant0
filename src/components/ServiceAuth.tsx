@@ -1,35 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useSession } from '@/components/SessionContext'
 import { Button } from '@/components/ui/button'
-import { SUPPORTED_SERVICES } from '@/lib/services'
 import { toast } from 'sonner'
-import type { ConnectedService } from '@/lib/services'
 
-interface ServiceAuthProps {
-  service: string
-}
-
-export function ServiceAuth({ service }: ServiceAuthProps) {
+export function ServiceAuth(service: string) {
+  const all_services = ['microsoft', 'salesforce', 'Google']
+  const user = useSession()
   const [isActive, setIsActive] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch user status')
-        return res.json()
-      })
-      .then(data => {
-        const connectedServices = data.connected_services || []
-        setIsActive(connectedServices.some((cs: ConnectedService) => 
-          cs.connection === SUPPORTED_SERVICES[service].connection
-        ))
-      })
-      .catch(err => {
-        console.error("Failed to check initial service status:", err)
-      })
-  }, [service])
+  const connectedServices = user?.identities || []
+  setIsActive(connectedServices.some((cs: string) => 
+    cs === SUPPORTED_SERVICES[service].connection
 
   const handleAuthClick = async () => {
     setIsLoading(true)

@@ -1,11 +1,13 @@
 import { createReactAgent, ToolNode } from '@langchain/langgraph/prebuilt'
 import { ChatOpenAI } from '@langchain/openai'
-//import { InMemoryStore, MemorySaver } from '@langchain/langgraph'
 
-import { getAccessToken, withGoogleConnection, withMicrosoftConnection, withSalesforceConnection } from './auth0-ai'
+import {
+  withGoogleConnection,
+  withMicrosoftConnection,
+  withSalesforceConnection
+} from './auth0-ai'
 
-// import { Calculator } from '@langchain/community/tools/calculator'
-// import { SerpAPI } from '@langchain/community/tools/serpapi'
+import { ConnectedServicesTool } from '@/tools/system/connected-services'
 
 // import Google tools
 import { google } from 'googleapis'
@@ -77,28 +79,24 @@ IMPORTANT: For data modification operations:
 
 Render email bodies as markdown blocks without code block wrapping.
 `
-//const msftParams = getAccessToken()
-//console.log('🔑 access token 🔑', msftParams)
-
-import { IdentityInspectorTool } from '@/tools/system/identity-inspector'
 
 const tools = [
-  IdentityInspectorTool,
+  ConnectedServicesTool,
   MicrosoftCalendarReadTool,
-  // withMicrosoftConnection(new MicrosoftCalendarWriteTool(msftParams).getTool()),
-  // withMicrosoftConnection(new MicrosoftFilesListTool(msftParams).getTool()),
-  // withMicrosoftConnection(new MicrosoftFilesReadTool(msftParams).getTool()),
-  // withMicrosoftConnection(new MicrosoftFilesWriteTool(msftParams).getTool()),
-  // withMicrosoftConnection(new MicrosoftMailReadTool(msftParams).getTool()),
-  // withMicrosoftConnection(new MicrosoftMailWriteTool(msftParams).getTool()),
+  // MicrosoftCalendarWriteTool,
+  // MicrosoftFilesListTool,
+  // MicrosoftFilesReadTool,
+  // MicrosoftFilesWriteTool,
+  // MicrosoftMailReadTool,
+  // MicrosoftMailWriteTool,
 ]
 
-let tracer
-if (process.env.LANGSMITH_TRACING === 'true') {
-  tracer = new LangChainTracer({
-    projectName: process.env.LANGSMITH_PROJECT || 'default',
-  })
-}
+// let tracer
+// if (process.env.LANGSMITH_TRACING === 'true') {
+//   tracer = new LangChainTracer({
+//     projectName: process.env.LANGSMITH_PROJECT || 'default',
+//   })
+// }
 
 const llm = new ChatOpenAI({
   modelName: process.env.OPENAI_MODEL || 'gpt-4o',

@@ -1,29 +1,32 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ServiceAuthPanel } from '@/components/ServiceAuthPanel'
+import { useSession } from '@/components/SessionContext'
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null)
+  const user = useSession()
+  console.log('user', user)
+  //const [user, setUser] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedUser, setEditedUser] = useState<any>(null)
 
-  useEffect(() => {
-    // User data is already available through Auth0 session in layout.tsx
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('/api/auth/me')
-        const sessionData = await response.json()
-        setUser(sessionData)
-        setEditedUser(sessionData)
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-      }
-    }
-    fetchUser()
-  }, [])
+  // useEffect(() => {
+  //   // User data is already available through Auth0 session in layout.tsx
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await fetch('/api/auth/me')
+  //       const sessionData = await response.json()
+  //       setUser(sessionData)
+  //       setEditedUser(sessionData)
+  //     } catch (error) {
+  //       console.error('Failed to fetch user:', error)
+  //     }
+  //   }
+  //   fetchUser()
+  // }, [])
 
   if (!user) {
     return <div className="p-4">Loading...</div>

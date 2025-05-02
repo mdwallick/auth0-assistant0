@@ -1,7 +1,7 @@
-import { Auth0AI } from '@auth0/ai-langchain'
+import { Auth0AI, getAccessTokenForConnection } from '@auth0/ai-langchain'
 
 // Get the access token for a connection via Auth0
-// export const getAccessToken = async () => getAccessTokenForConnection()
+export const getAccessToken = async () => getAccessTokenForConnection()
 
 const auth0AI = new Auth0AI()
 
@@ -17,7 +17,19 @@ export const withGoogleConnection = auth0AI.withTokenForConnection({
 
 // Connection for Microsoft services
 export const withMicrosoftConnection = auth0AI.withTokenForConnection({
+  // accessToken: async (params, config) => {
+  //   return config?.configurable?._credentials?.accessToken
+  // },
   refreshToken: async (params, config) => {
+    console.log("Refreshing token...");
+    console.log("Current credentials:", config?.configurable?._credentials);
+
+    const accessToken = config?.configurable?._credentials?.accessToken;
+    if (!accessToken) {
+      console.error("No access token available");
+      throw new Error("No access token available.");
+    }
+    
     return config?.configurable?._credentials?.refreshToken
   },
   connection: 'windowslive',

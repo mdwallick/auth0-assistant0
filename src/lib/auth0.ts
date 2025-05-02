@@ -29,16 +29,16 @@ export const auth0 = new Auth0Client({
     // },
   },
 
-  // async beforeSessionSaved(session, idToken) {
-  //   const decoded_jwt = decodeJwt(idToken) 
-  //   return {
-  //     ...session,
-  //     user: {
-  //       ...session.user,
-  //       connected_services: decoded_jwt?.connected_services || []
-  //     },
-  //   }
-  // },
+  async beforeSessionSaved(session, idToken) {
+    const decoded_jwt = decodeJwt(idToken) 
+    return {
+      ...session,
+      user: {
+        ...session.user,
+        identities: decoded_jwt?.identities || []
+      },
+    }
+  },
 })
 
 // Get the refresh token from Auth0 session
@@ -59,14 +59,14 @@ export async function getAccessToken(connection: string): Promise<string> {
   }
 }
 
-// function decodeJwt(token: string | null) {
-//   if (!token) return null;
-//   try {
-//     const payload = token.split('.')[1];
-//     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-//     const json = atob(base64);
-//     return JSON.parse(json);
-//   } catch (err) {
-//     return null;
-//   }
-// }
+function decodeJwt(token: string | null) {
+  if (!token) return null;
+  try {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch (err) {
+    return null;
+  }
+}

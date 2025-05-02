@@ -2,9 +2,9 @@ import './globals.css'
 import { Roboto_Mono, Inter } from 'next/font/google'
 import Image from 'next/image'
 
-import { ClientAuthProvider } from '@/components/ClientAuthProvider'
 import { ActiveLink, Navbar } from '@/components/Navbar'
 import { Toaster } from '@/components/ui/sonner'
+import { SessionProvider } from '@/components/SessionProvider' 
 import { auth0 } from '@/lib/auth0'
 import { TokenDisplay } from '@/components/TokenDisplay'
 
@@ -49,7 +49,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           )}
           <div className="grid grid-cols-[1fr,400px] h-[calc(100vh-8rem)]">
             <div className="gradient-up bg-gradient-to-b from-white/10 to-white/0 relative grid border-input border-b-0">
-              <div className="absolute inset-0">{children}</div>
+              <SessionProvider session={session}>
+                <div className="absolute inset-0">{children}</div>
+              </SessionProvider>
             </div>
             {session && (
               <div className="p-4">

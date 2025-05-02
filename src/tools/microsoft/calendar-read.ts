@@ -1,4 +1,4 @@
-import { tool } from '@langchain/core/tools'
+import { DynamicStructuredTool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
 import { withMicrosoftConnection } from '@/lib/auth0-ai'
@@ -11,37 +11,44 @@ const toolSchema = z.object({
 })
 
 export const MicrosoftCalendarReadTool = withMicrosoftConnection(
-  tool(
-    async ({ timeMin, timeMax, timeZone = 'US/Central' }) => {
-      const accessToken = getAccessTokenForConnection()
-      console.log('🔑 access token 🔑', accessToken)
-      const client = Client.init({
-        authProvider: (done) => {
-          done(null, accessToken)
-        },
-      })
-  
-      const response = await client
-        .api('/me/calendarview')
-        .header('Prefer', `outlook.timezone="${timeZone || 'UTC'}"`)
-        .query({
-          startDateTime: timeMin,
-          endDateTime: timeMax,
-          orderby: 'start/dateTime',
-        })
-        .get()
-  
-      return JSON.stringify({
-        status: 'success',
-        startDate: timeMin,
-        endDate: timeMax,
-        events: response.value,
-      })
-    },
-    {
-      name: 'MicrosoftCalendarReadTool',
-      description: "Check a user's schedule between the given date times on their Microsoft calendar",
-      schema: toolSchema,
-    }
-  )
+  new DynamicStructuredTool({
+    name: 'MicrosoftCalendarReadTool',
+    description: "Check a user's schedule between the given date times on their Microsoft calendar",
+    schema: toolSchema,
+    func: readMicrosoftCalendar
+  })
 )
+
+async function readMicrosoftCalendar(
+  { timeMin, timeMax, timeZone = 'US/Central' }: z.infer<typeof toolSchema>,
+    accessToken: string
+) {
+  console.log('📅 In calendar read tool')
+  
+  if (!accessToken) {
+    throw new FederatedConnectionError('microsoft')
+  }
+  
+  const client = Client.init({
+    authProvider: (done) => {
+      done(null, accessToken)
+    },
+  })
+
+  const response = await client
+    .api('/me/calendarview')
+    .header('Prefer', `outlook.timezone="${timeZone || 'UTC'}"`)
+    .query({
+      startDateTime: timeMin,
+      endDateTime: timeMax,
+      orderby: 'start/dateTime',
+    })
+    .get()
+
+  return JSON.stringify({
+    status: 'success',
+    startDate: timeMin,
+    endDate: timeMax,
+    events: response.value,
+  })
+}
