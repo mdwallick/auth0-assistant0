@@ -8,12 +8,14 @@ import { useSession } from '@/components/SessionContext'
 
 export default function ProfilePage() {
   const session = useSession()
+  const [user, setUser] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedUser, setEditedUser] = useState<any>(null)
 
   useEffect(() => {
     if (session?.user) {
       setEditedUser(session.user)
+      setUser(session.user)
     }
   }, [session])
 
