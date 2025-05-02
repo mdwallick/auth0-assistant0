@@ -1,6 +1,7 @@
 'use client'
 
 import { ServiceAuth } from './ServiceAuth'
+import { SUPPORTED_SERVICES } from '@/lib/types'
 
 export function ServiceAuthPanel() {
   return (
