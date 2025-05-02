@@ -20,18 +20,24 @@ export const withMicrosoftConnection = auth0AI.withTokenForConnection({
   // accessToken: async (params, config) => {
   //   return config?.configurable?._credentials?.accessToken
   // },
-  refreshToken: async (params, config) => {
-    console.log("Refreshing token...");
-    console.log("Current credentials:", config?.configurable?._credentials);
+  // refreshToken: async (params, config) => {
+  //   console.log("params", params)
+  //   console.log("Refreshing token...")
+  //   const accessToken = getAccessTokenForConnection()
+  //   console.log('accessToken', accessToken)
+  //   console.log('Got new access token')
+  //   config.configurable._credentials.accessToken = accessToken
+  //   console.log("Current credentials:", config?.configurable?._credentials)
 
-    const accessToken = config?.configurable?._credentials?.accessToken;
-    if (!accessToken) {
-      console.error("No access token available");
-      throw new Error("No access token available.");
-    }
+  //   //const accessToken = config?.configurable?._credentials?.accessToken
     
-    return config?.configurable?._credentials?.refreshToken
-  },
+  //   if (!accessToken) {
+  //     console.error("No access token available")
+  //     throw new Error("No access token available.")
+  //   }
+    
+  //   return config?.configurable?._credentials?.refreshToken
+  // },
   connection: 'windowslive',
   scopes: [
     'Mail.Send',

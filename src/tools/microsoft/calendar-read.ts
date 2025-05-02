@@ -1,7 +1,7 @@
 import { DynamicStructuredTool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { Client } from '@microsoft/microsoft-graph-client'
-import { withMicrosoftConnection } from '@/lib/auth0-ai'
+import { getAccessToken, withMicrosoftConnection } from '@/lib/auth0-ai'
 import { FederatedConnectionError } from "@auth0/ai/interrupts"
 
 const toolSchema = z.object({
@@ -20,11 +20,12 @@ export const MicrosoftCalendarReadTool = withMicrosoftConnection(
 )
 
 async function readMicrosoftCalendar(
-  { timeMin, timeMax, timeZone = 'US/Central' }: z.infer<typeof toolSchema>,
-    accessToken: string
+  { timeMin, timeMax, timeZone = 'US/Central' }: z.infer<typeof toolSchema>
 ) {
   console.log('📅 In calendar read tool')
   
+  const accessToken = await getAccessToken();
+
   if (!accessToken) {
     throw new FederatedConnectionError('microsoft')
   }

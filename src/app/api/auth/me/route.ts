@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server'
 import { auth0 } from '@/lib/auth0'
+import { mapConnectionToName } from '@/lib/types'
 import type { ConnectedService } from '@/lib/types'
 
 export async function GET() {
@@ -11,7 +12,9 @@ export async function GET() {
   }
 
   // Map the identities to ConnectedService type
-  const mappedIdentities: ConnectedService[] = session.user.identities?.map((identity: ConnectedService) => ({
+  const user_id = session.user.user_id.split('|')[1]
+  const orig_identities = session.user.identities.filter((id: ConnectedService) => id.user_id !== user_id)
+  const mappedIdentities: ConnectedService[] = orig_identities?.map((identity: ConnectedService) => ({
     name: mapConnectionToName(identity.connection),
     provider: identity.provider,
     user_id: identity.user_id,
@@ -25,22 +28,4 @@ export async function GET() {
   }
   
   return NextResponse.json(response)
-}
-
-function mapConnectionToName(connection: string) {
-  let name = ''
-  switch(connection) {
-    case "windowslive":
-      name = "Microsoft"
-      break
-    case "google-oauth2":
-      name = "Google"
-      break
-    case "salesforce-dev":
-      name = "Salesforce"
-      break
-    default:
-      name = "service not implemented"
-  }
-  return name
 }

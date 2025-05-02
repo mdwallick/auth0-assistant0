@@ -20,3 +20,21 @@ export const SUPPORTED_SERVICES = {
     displayName: 'Google'
   }
 }
+
+export function mapConnectionToName(connection: string) {
+  let name = ''
+  switch(connection) {
+    case "windowslive":
+      name = "Microsoft"
+      break
+    case "google-oauth2":
+      name = "Google"
+      break
+    case "salesforce-dev":
+      name = "Salesforce"
+      break
+    default:
+      name = "service not implemented"
+  }
+  return name
+}

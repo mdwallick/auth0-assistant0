@@ -1,5 +1,6 @@
 import { createReactAgent, ToolNode } from '@langchain/langgraph/prebuilt'
 import { ChatOpenAI } from '@langchain/openai'
+import { LangChainTracer } from 'langchain/callbacks'
 
 import {
   withGoogleConnection,
@@ -91,28 +92,33 @@ const tools = [
   // MicrosoftMailWriteTool,
 ]
 
-// let tracer
-// if (process.env.LANGSMITH_TRACING === 'true') {
-//   tracer = new LangChainTracer({
-//     projectName: process.env.LANGSMITH_PROJECT || 'default',
-//   })
-// }
+const toolsNode = new ToolNode(tools, {
+  // Error handler must be disabled in order to trigger interruptions from within tools.
+  handleToolErrors: false,
+})
+
+let tracer
+if (process.env.LANGSMITH_TRACING === 'true') {
+  tracer = new LangChainTracer({
+    projectName: process.env.LANGSMITH_PROJECT || 'default',
+  })
+}
 
 const llm = new ChatOpenAI({
   modelName: process.env.OPENAI_MODEL || 'gpt-4o',
   temperature: 0,
 })
-  // .bind({
-  //   tools,
-  // })
-  // .withConfig({
-  //   tags: ['chat-api'],
-  //   callbacks: tracer ? [tracer] : undefined,
-  // })
+  .bind({
+    tools,
+  })
+  .withConfig({
+    tags: ['chat-api'],
+    callbacks: tracer ? [tracer] : undefined,
+  })
 
 export const agent = createReactAgent({
   llm,
-  tools,
+  tools: toolsNode,
   prompt: AGENT_SYSTEM_TEMPLATE,
   //messageModifier: new SystemMessage(AGENT_SYSTEM_TEMPLATE),
 })

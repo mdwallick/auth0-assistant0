@@ -8,11 +8,10 @@ import { toast } from 'sonner'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 import { ArrowDown, ArrowUpIcon, LoaderCircle } from 'lucide-react'
 
+import { FederatedConnectionInterruptHandler } from '@/components/auth0-ai/FederatedConnections/FederatedConnectionInterruptHandler'
 import { ChatMessageBubble } from '@/components/ChatMessageBubble'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
-
-import { TokenDisplay } from './TokenDisplay'
 
 function ChatMessages(props: {
   messages: Message[]
@@ -132,82 +131,6 @@ export function ChatWindow(props: {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // const checkServiceStatus = async () => {
-  //   const response = await fetch('/api/services/status')
-  //   const data = await response.json()
-  //   setMessages(prev => [...prev, {
-  //     id: Date.now().toString(),
-  //     role: 'assistant',
-  //     content: `Current service status:\n${data.status.map((s: any) => `${s.service}: ${s.status}`).join('\n')}`
-  //   }])
-  // }
-
-  // const handleServiceConnection = async (service: string) => {
-  //   try {
-  //     const width = 500
-  //     const height = 600
-  //     const left = window.screenX + (window.outerWidth - width) / 2
-  //     const top = window.screenY + (window.outerHeight - height) / 2
-
-  //     const userResponse = await fetch('/api/auth/me')
-  //     const userData = await userResponse.json()
-  //     const extUserId = userData?.sub || ''
-  //     const userId = encodeURIComponent(extUserId.replace('|', ':'))
-
-  //     const popup = window.open(
-  //       `/auth/login?connection=${SERVICE_CONFIGS[service].connection}&ext-primary-user-id=${userId}`,
-  //       'Auth0 Login',
-  //       `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
-  //     )
-
-  //     if (!popup) {
-  //       throw new Error('Please enable popups for this site')
-  //     }
-
-  //     const result = await new Promise((resolve, reject) => {
-  //       const messageHandler = (event: MessageEvent) => {
-  //         if (event.data.type === 'AUTH_COMPLETE') {
-  //           window.removeEventListener('message', messageHandler)
-  //           resolve(true)
-  //         } else if (event.data.type === 'AUTH_ERROR') {
-  //           window.removeEventListener('message', messageHandler)
-  //           reject(new Error(event.data.error))
-  //         }
-  //       }
-  //       window.addEventListener('message', messageHandler)
-  //     })
-
-  //     // Wait for auth to complete
-  //     await new Promise(resolve => setTimeout(resolve, 2000))
-      
-  //     // Get updated service status
-  //     const statusResponse = await fetch('/api/services/status')
-  //     const statusData = await statusResponse.json()
-      
-  //     // Format service status message
-  //     const serviceStatus = statusData.activeServices.map((svc: string) => 
-  //       `- ${svc}: ✅ Connected`
-  //     ).join('\n')
-      
-  //     const inactiveServices = ['microsoft', 'salesforce', 'google']
-  //       .filter(svc => !statusData.activeServices.includes(svc))
-  //       .map(svc => `- ${svc}: ❌ Not Connected`)
-  //       .join('\n')
-
-  //     setMessages(prev => [...prev, {
-  //       id: Date.now().toString(),
-  //       role: 'assistant',
-  //       content: `Successfully connected to ${service}!\n\nCurrent service status:\n${serviceStatus}\n${inactiveServices}`
-  //     }])
-  //   } catch (error) {
-  //     setMessages(prev => [...prev, {
-  //       id: Date.now().toString(),
-  //       role: 'assistant',
-  //       content: `Failed to connect to ${service}: ${error.message}\n\nPlease try again or contact support if the issue persists.`
-  //     }])
-  //   }
-  // }
-
   const chat = useChat({
     api: props.endpoint,
     initialMessages: messages,
@@ -251,12 +174,17 @@ export function ChatWindow(props: {
           ) : chat.messages.length === 0 ? (
             <div>{props.emptyStateComponent}</div>
           ) : (
-            <ChatMessages
-              aiEmoji={props.emoji}
-              messages={chat.messages}
-              emptyStateComponent={props.emptyStateComponent}
-              isStreaming={isChatLoading()}
-            />
+            <>
+              <ChatMessages
+                aiEmoji={props.emoji}
+                messages={chat.messages}
+                emptyStateComponent={props.emptyStateComponent}
+                isStreaming={isChatLoading()}
+              />
+              <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
+                <FederatedConnectionInterruptHandler interrupt={chat.interrupt} onFinish={() => chat.submit(null)} />
+              </div>
+            </>
           )
         }
         footer={
