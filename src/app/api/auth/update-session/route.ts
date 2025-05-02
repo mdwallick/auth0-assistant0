@@ -3,7 +3,7 @@ import { AccessTokenError } from '@auth0/nextjs-auth0/errors'
 import type { SessionData } from '@auth0/nextjs-auth0/types'
 import { ManagementClient } from 'auth0'
 import { auth0 } from "@/lib/auth0"
-import type { ConnectedService } from "@/lib/services"
+import type { ConnectedService } from "@/lib/types"
 
 // Define a type for the expected UserInfo shape from /userinfo
 interface UserInfo {
@@ -31,7 +31,7 @@ interface UserInfo {
   };
   updated_at?: number;
   // Add any custom claims expected from /userinfo
-  connected_services?: Array<ConnectedService>
+  identities?: Array<ConnectedService>
   [key: string]: any; // Allow other properties
 }
 

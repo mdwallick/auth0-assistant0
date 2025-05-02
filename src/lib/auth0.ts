@@ -3,29 +3,6 @@ import { ReplDBSessionStore } from './repl-db-session-store'
 
 const sessionStore = new ReplDBSessionStore()
 
-export type ConnectedService = {
-  name: string
-  provider: string
-  user_id: string
-  connection: string
-  isSocial: boolean
-}
-
-export const SUPPORTED_SERVICES = {
-  'microsoft': {
-    connection: 'windowslive',
-    displayName: 'Microsoft'
-  },
-  'salesforce': {
-    connection: 'salesforce-dev',
-    displayName: 'Salesforce'
-  },
-  'google': {
-    connection: 'google-oauth2',
-    displayName: 'Google'
-  }
-}
-
 export const auth0 = new Auth0Client({
   secret: process.env.AUTH0_SECRET!,
   domain: process.env.AUTH0_ISSUER_BASE_URL!,

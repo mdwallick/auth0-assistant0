@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { useSession } from '@/components/SessionContext'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { SUPPORTED_SERVICES } from '@/lib/auth0'
-import type { ConnectedService } from '@/lib/auth0'
+import { SUPPORTED_SERVICES } from '@/lib/types'
+import type { ConnectedService } from '@/lib/types'
 
 export function ServiceAuth({ service }: { service: keyof typeof SUPPORTED_SERVICES }) {
   const session = useSession()

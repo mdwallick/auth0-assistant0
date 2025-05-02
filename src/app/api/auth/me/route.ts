@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth0 } from '@/lib/auth0'
+import type { ConnectedService } from '@/lib/types'
 
 export async function GET() {
   const session = await auth0.getSession()
@@ -10,8 +11,8 @@ export async function GET() {
 
   const response = {
     ...session.user,
-    connected_services: session.user['connected_services'] || [],
-    id_token: session.tokenSet?.idToken || null,
+    identities: session.user.identities || [],
+    //id_token: session.tokenSet?.idToken || null,
   }
   
   return NextResponse.json(response)
