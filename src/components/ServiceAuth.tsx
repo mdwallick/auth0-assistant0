@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -5,15 +6,28 @@ import { useSession } from '@/components/SessionContext'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
-export function ServiceAuth(service: string) {
-  const all_services = ['microsoft', 'salesforce', 'Google']
+const SUPPORTED_SERVICES = {
+  'microsoft': {
+    connection: 'windowslive',
+    displayName: 'Microsoft'
+  },
+  'salesforce': {
+    connection: 'salesforce-dev',
+    displayName: 'Salesforce'
+  },
+  'google': {
+    connection: 'google-oauth2',
+    displayName: 'Google'
+  }
+}
+
+export function ServiceAuth({ service }: { service: keyof typeof SUPPORTED_SERVICES }) {
   const user = useSession()
-  const [isActive, setIsActive] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const connectedServices = user?.identities || []
-  setIsActive(connectedServices.some((cs: string) => 
-    cs === SUPPORTED_SERVICES[service].connection
+  const isActive = user?.identities?.some(identity => 
+    identity.connection === SUPPORTED_SERVICES[service].connection
+  ) || false
 
   const handleAuthClick = async () => {
     setIsLoading(true)
@@ -45,18 +59,9 @@ export function ServiceAuth(service: string) {
           }
         }
         window.addEventListener('message', messageHandler)
-
-        const intervalId = setInterval(() => {
-          if (popup.closed) {
-            clearInterval(intervalId)
-            window.removeEventListener('message', messageHandler)
-            console.log('Popup closed without completing auth message.')
-          }
-        }, 500)
       })
 
       toast.info('Authentication complete. Refreshing your session...')
-      console.log('Auth complete message received. Refreshing session...')
 
       const refreshResponse = await fetch('/api/auth/update-session', { method: 'POST' })
       const refreshData = await refreshResponse.json()
@@ -65,11 +70,10 @@ export function ServiceAuth(service: string) {
         throw new Error(refreshData.error || `Failed to refresh session (${refreshResponse.status})`)
       }
 
-      setIsActive(true)
-      toast.success(`Successfully connected to ${service}! Session updated.`)
+      toast.success(`Successfully connected to ${SUPPORTED_SERVICES[service].displayName}!`)
 
     } catch (error: any) {
-      toast.error(`Failed to connect ${service}: ${error.message}`)
+      toast.error(`Failed to connect ${SUPPORTED_SERVICES[service].displayName}: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
@@ -77,7 +81,7 @@ export function ServiceAuth(service: string) {
 
   return (
     <div className="flex items-center gap-2 p-2">
-      <span className="capitalize">{service}</span>
+      <span className="capitalize">{SUPPORTED_SERVICES[service].displayName}</span>
       {!isLoading && <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`} />}
       {isLoading && <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" title="Processing..."></span>}
 
