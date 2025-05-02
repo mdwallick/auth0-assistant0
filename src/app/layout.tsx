@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 import { ActiveLink, Navbar } from '@/components/Navbar'
 import { Toaster } from '@/components/ui/sonner'
-import { SessionProvider } from '@/components/SessionProvider' 
+import { SessionProvider } from '@/components/SessionContext' 
 import { auth0 } from '@/lib/auth0'
 import { TokenDisplay } from '@/components/TokenDisplay'
 

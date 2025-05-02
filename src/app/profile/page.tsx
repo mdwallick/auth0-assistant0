@@ -7,9 +7,9 @@ import { ServiceAuthPanel } from '@/components/ServiceAuthPanel'
 import { useSession } from '@/components/SessionContext'
 
 export default function ProfilePage() {
-  const user = useSession()
-  console.log('user', user)
-  //const [user, setUser] = useState<any>(null)
+  const session = useSession()
+  console.log(session)
+  const [user, setUser] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedUser, setEditedUser] = useState<any>(null)
 
@@ -28,8 +28,11 @@ export default function ProfilePage() {
   //   fetchUser()
   // }, [])
 
-  if (!user) {
+  if (!session) {
     return <div className="p-4">Loading...</div>
+  } else {
+    setUser(session.user)
+    setEditedUser(session.user)
   }
 
   return (
