@@ -13,7 +13,7 @@ export function ServiceAuth({ service }: { service: keyof typeof SUPPORTED_SERVI
   const [isLoading, setIsLoading] = useState(false)
 
   const isActive = (user?.identities as ConnectedService[])?.some(identity => 
-    identity.name === SUPPORTED_SERVICES[service].displayName
+    identity.connection === SUPPORTED_SERVICES[service].connection
   ) || false
   
   const handleAuthClick = async () => {
