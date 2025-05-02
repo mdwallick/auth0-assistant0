@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ServiceAuthPanel } from '@/components/ServiceAuthPanel'
@@ -8,31 +8,17 @@ import { useSession } from '@/components/SessionContext'
 
 export default function ProfilePage() {
   const session = useSession()
-  console.log(session)
-  const [user, setUser] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedUser, setEditedUser] = useState<any>(null)
 
-  // useEffect(() => {
-  //   // User data is already available through Auth0 session in layout.tsx
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await fetch('/api/auth/me')
-  //       const sessionData = await response.json()
-  //       setUser(sessionData)
-  //       setEditedUser(sessionData)
-  //     } catch (error) {
-  //       console.error('Failed to fetch user:', error)
-  //     }
-  //   }
-  //   fetchUser()
-  // }, [])
+  useEffect(() => {
+    if (session?.user) {
+      setEditedUser(session.user)
+    }
+  }, [session])
 
   if (!session) {
     return <div className="p-4">Loading...</div>
-  } else {
-    setUser(session.user)
-    setEditedUser(session.user)
   }
 
   return (
@@ -46,13 +32,13 @@ export default function ProfilePage() {
                 <div className="space-y-2">
                   <label className="text-sm">Name</label>
                   <Input
-                    value={editedUser.name}
+                    value={editedUser?.name || ''}
                     onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Email</label>
-                  <Input value={user.email} disabled />
+                  <Input value={session.user.email} disabled />
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={() => setIsEditing(false)}>Save</Button>
@@ -60,7 +46,7 @@ export default function ProfilePage() {
                     variant="outline"
                     onClick={() => {
                       setIsEditing(false)
-                      setEditedUser(user)
+                      setEditedUser(session.user)
                     }}
                   >
                     Cancel
@@ -71,11 +57,11 @@ export default function ProfilePage() {
               <>
                 <div className="grid grid-cols-[100px,1fr] gap-2">
                   <span className="text-muted-foreground">Name:</span>
-                  <span>{user.name}</span>
+                  <span>{session.user.name}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] gap-2">
                   <span className="text-muted-foreground">Email:</span>
-                  <span>{user.email}</span>
+                  <span>{session.user.email}</span>
                 </div>
                 <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
               </>
