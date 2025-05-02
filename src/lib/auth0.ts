@@ -3,6 +3,29 @@ import { ReplDBSessionStore } from './repl-db-session-store'
 
 const sessionStore = new ReplDBSessionStore()
 
+export type ConnectedService = {
+  name: string
+  provider: string
+  user_id: string
+  connection: string
+  isSocial: boolean
+}
+
+export const SUPPORTED_SERVICES = {
+  'microsoft': {
+    connection: 'windowslive',
+    displayName: 'Microsoft'
+  },
+  'salesforce': {
+    connection: 'salesforce-dev',
+    displayName: 'Salesforce'
+  },
+  'google': {
+    connection: 'google-oauth2',
+    displayName: 'Google'
+  }
+}
+
 export const auth0 = new Auth0Client({
   secret: process.env.AUTH0_SECRET!,
   domain: process.env.AUTH0_ISSUER_BASE_URL!,
@@ -47,17 +70,17 @@ export const getRefreshToken = async () => {
   return session?.tokenSet?.refreshToken
 }
 
-export async function getAccessToken(connection: string): Promise<string> {
-  try {
-    const token = await auth0.getAccessTokenForConnection({
-      connection: connection,
-    })
-    return token
-  } catch (error: any) {
-      // Return empty string for non-connected services
-    return ''
-  }
-}
+// export async function getAccessToken(connection: string): Promise<string> {
+//   try {
+//     const token = await auth0.getAccessTokenForConnection({
+//       connection: connection,
+//     })
+//     return token.token
+//   } catch (error: any) {
+//       // Return empty string for non-connected services
+//     return ''
+//   }
+// }
 
 function decodeJwt(token: string | null) {
   if (!token) return null;

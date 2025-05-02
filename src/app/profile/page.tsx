@@ -40,7 +40,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Email</label>
-                  <Input value={session.user.email} disabled />
+                  <Input value={user.email} disabled />
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={() => setIsEditing(false)}>Save</Button>
@@ -59,11 +59,11 @@ export default function ProfilePage() {
               <>
                 <div className="grid grid-cols-[100px,1fr] gap-2">
                   <span className="text-muted-foreground">Name:</span>
-                  <span>{session.user.name}</span>
+                  <span>{user.name}</span>
                 </div>
                 <div className="grid grid-cols-[100px,1fr] gap-2">
                   <span className="text-muted-foreground">Email:</span>
-                  <span>{session.user.email}</span>
+                  <span>{user.email}</span>
                 </div>
                 <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
               </>

@@ -4,30 +4,18 @@ import { useState } from 'react'
 import { useSession } from '@/components/SessionContext'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-
-const SUPPORTED_SERVICES = {
-  'microsoft': {
-    connection: 'windowslive',
-    displayName: 'Microsoft'
-  },
-  'salesforce': {
-    connection: 'salesforce-dev',
-    displayName: 'Salesforce'
-  },
-  'google': {
-    connection: 'google-oauth2',
-    displayName: 'Google'
-  }
-}
+import { SUPPORTED_SERVICES } from '@/lib/auth0'
+import type { ConnectedService } from '@/lib/auth0'
 
 export function ServiceAuth({ service }: { service: keyof typeof SUPPORTED_SERVICES }) {
   const session = useSession()
+  const user = session?.user
   const [isLoading, setIsLoading] = useState(false)
 
-  const isActive = session?.user?.identities?.some(identity => 
+  const isActive = (user?.identities as ConnectedService[])?.some(identity => 
     identity.name === SUPPORTED_SERVICES[service].displayName
   ) || false
-
+  
   const handleAuthClick = async () => {
     setIsLoading(true)
 
