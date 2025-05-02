@@ -2,6 +2,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools'
 import { z } from 'zod'
 import { auth0 } from '@/lib/auth0'
 import { mapConnectionToName } from '@/lib/types'
+import { SUPPORTED_SERVICES } from '@/lib/types'
 import type { ConnectedService } from '@/lib/types'
 
 const toolSchema = z.object({
@@ -26,11 +27,8 @@ async function getConnectedServices() {
     }
 
     const user_id = session.user.user_id.split('|')[1]
-    const identities = session.user.identities.filter((id: ConnectedService) => id.user_id !== user_id) || []
-    
-    return JSON.stringify({
-      success: true,
-      identities: identities.map((identity: ConnectedService) => ({
+    const filtered_identities = session.user.identities.filter((id: ConnectedService) => id.user_id !== user_id) || []
+    const identities = filtered_identities.map((identity: ConnectedService) => ({
         name: mapConnectionToName(identity.connection),
         provider: identity.provider,
         connection: identity.connection,
@@ -38,6 +36,10 @@ async function getConnectedServices() {
         userId: identity.user_id
         // profileData: identity.profileData
       }))
+    
+    return JSON.stringify({
+      success: true,
+      identities: identities
     })
   } catch (error) {
     return JSON.stringify({

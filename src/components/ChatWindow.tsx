@@ -9,6 +9,8 @@ import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 import { ArrowDown, ArrowUpIcon, LoaderCircle } from 'lucide-react'
 
 import { FederatedConnectionInterruptHandler } from '@/components/auth0-ai/FederatedConnections/FederatedConnectionInterruptHandler'
+import type { Interrupt } from '@langchain/langgraph-sdk'
+
 import { ChatMessageBubble } from '@/components/ChatMessageBubble'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
@@ -130,9 +132,17 @@ export function ChatWindow(props: {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
 
   const chat = useChat({
     api: props.endpoint,
+    fetch: (input, init = {}) => {
+      const controller = new AbortController()
+      setAbortController(controller)
+
+      init.signal = controller.signal
+      return fetch(input, init)
+    },
     initialMessages: messages,
     onFinish(response) {
       console.log('Final response: ', response?.content)
@@ -155,6 +165,13 @@ export function ChatWindow(props: {
     return chat.isLoading
   }
 
+  const interrupt: Interrupt = () => {
+    if (abortController) {
+      abortController.abort()
+      setAbortController(null)
+    }
+  }
+  
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (isChatLoading()) return
@@ -182,7 +199,7 @@ export function ChatWindow(props: {
                 isStreaming={isChatLoading()}
               />
               <div className="flex flex-col max-w-[768px] mx-auto pb-12 w-full">
-                <FederatedConnectionInterruptHandler interrupt={chat.interrupt} onFinish={() => chat.submit(null)} />
+                <FederatedConnectionInterruptHandler interrupt={interrupt} onFinish={() => chat.handleSubmit()} />
               </div>
             </>
           )
