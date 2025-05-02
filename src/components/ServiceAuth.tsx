@@ -22,14 +22,12 @@ const SUPPORTED_SERVICES = {
 
 export function ServiceAuth({ service }: { service: keyof typeof SUPPORTED_SERVICES }) {
   const session = useSession()
-  const user = session?.user
   const [isLoading, setIsLoading] = useState(false)
 
-  //console.log('ðŸ”‘ identities ðŸ”‘', session.user)
-  const isActive = user?.identities?.some(identity => 
+  const isActive = session?.user?.identities?.some(identity => 
     identity.name === SUPPORTED_SERVICES[service].displayName
   ) || false
-  
+
   const handleAuthClick = async () => {
     setIsLoading(true)
 
